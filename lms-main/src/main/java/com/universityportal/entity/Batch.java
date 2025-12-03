@@ -16,7 +16,7 @@ public class Batch {
     // e.g. "A", "B", "Fall-2024-BSCS-A"
     private String name;
 
-    @OneToMany(mappedBy = "batch", cascade = CascadeType.ALL, orphanRemoval = false)
+    @OneToMany(mappedBy = "batchEntity", cascade = CascadeType.ALL, orphanRemoval = false)
     private List<Student> students = new ArrayList<>();
 
     public Batch() {
@@ -46,5 +46,3 @@ public class Batch {
         this.students = students;
     }
 }
-
-

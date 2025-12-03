@@ -33,7 +33,7 @@ public class StudentMapper {
         dto.setWifiAccount(student.getWifiAccount());
         dto.setOffice365Email(student.getOffice365Email());
         dto.setOffice365Pass(student.getOffice365Pass());
-        dto.setBatch(student.getBatch());
+        dto.setBatch(student.getBatchEntity() != null ? student.getBatchEntity().getName() : null);
         return dto;
     }
 
@@ -69,8 +69,6 @@ public class StudentMapper {
         student.setWifiAccount(dto.getWifiAccount());
         student.setOffice365Email(dto.getOffice365Email());
         student.setOffice365Pass(dto.getOffice365Pass());
-        student.setBatch(dto.getBatch());
+
     }
 }
-
-

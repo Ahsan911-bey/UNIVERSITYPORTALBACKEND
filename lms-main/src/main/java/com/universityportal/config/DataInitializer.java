@@ -18,17 +18,17 @@ public class DataInitializer {
 
     @Bean
     public CommandLineRunner seedData(StudentRepository studentRepository,
-                                      TeacherRepository teacherRepository,
-                                      AdminRepository adminRepository,
-                                      CourseRepository courseRepository,
-                                      MarksRepository marksRepository,
-                                      AttendanceRepository attendanceRepository,
-                                      AssignmentRepository assignmentRepository,
-                                      StudentCourseEnrollmentRepository enrollmentRepository,
-                                      BatchRepository batchRepository,
-                                      AnnouncementRepository announcementRepository,
-                                      LearningResourceRepository learningResourceRepository,
-                                      JdbcTemplate jdbcTemplate) {
+            TeacherRepository teacherRepository,
+            AdminRepository adminRepository,
+            CourseRepository courseRepository,
+            MarksRepository marksRepository,
+            AttendanceRepository attendanceRepository,
+            AssignmentRepository assignmentRepository,
+            StudentCourseEnrollmentRepository enrollmentRepository,
+            BatchRepository batchRepository,
+            AnnouncementRepository announcementRepository,
+            LearningResourceRepository learningResourceRepository,
+            JdbcTemplate jdbcTemplate) {
         return args -> {
             // Clear existing data so we always start with the same mock dataset
             marksRepository.deleteAll();
@@ -79,30 +79,31 @@ public class DataInitializer {
 
             // ========== CREATE 10 TEACHERS ==========
             String[] teacherNames = {
-                "Dr. Ali Ahmed", "Prof. Sara Khan", "Dr. Ahmed Hassan", "Ms. Fatima Ali",
-                "Dr. Usman Malik", "Prof. Ayesha Sheikh", "Dr. Bilal Raza", "Ms. Hina Shah",
-                "Dr. Zain Abbas", "Prof. Mariam Khan"
+                    "Dr. Ali Ahmed", "Prof. Sara Khan", "Dr. Ahmed Hassan", "Ms. Fatima Ali",
+                    "Dr. Usman Malik", "Prof. Ayesha Sheikh", "Dr. Bilal Raza", "Ms. Hina Shah",
+                    "Dr. Zain Abbas", "Prof. Mariam Khan"
             };
             String[] qualifications = {
-                "PhD Computer Science", "MSCS", "PhD Software Engineering", "MSCS",
-                "PhD Data Science", "MSCS", "PhD AI", "MSCS",
-                "PhD Networking", "MSCS"
+                    "PhD Computer Science", "MSCS", "PhD Software Engineering", "MSCS",
+                    "PhD Data Science", "MSCS", "PhD AI", "MSCS",
+                    "PhD Networking", "MSCS"
             };
             String[] specializations = {
-                "Artificial Intelligence", "Web Development", "Database Systems", "Mobile Development",
-                "Machine Learning", "Cybersecurity", "Cloud Computing", "Software Engineering",
-                "Network Security", "Data Structures"
+                    "Artificial Intelligence", "Web Development", "Database Systems", "Mobile Development",
+                    "Machine Learning", "Cybersecurity", "Cloud Computing", "Software Engineering",
+                    "Network Security", "Data Structures"
             };
-            String[] programs = {"Computer Science", "Software Engineering", "Information Technology"};
-            String[] sessions = {"2020-2024", "2021-2025", "2022-2026"};
-            String[] campuses = {"Main", "North", "South"};
+            String[] programs = { "Computer Science", "Software Engineering", "Information Technology" };
+            String[] sessions = { "2020-2024", "2021-2025", "2022-2026" };
+            String[] campuses = { "Main", "North", "South" };
 
             List<Teacher> teachers = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
                 Teacher teacher = new Teacher();
                 teacher.setName(teacherNames[i]);
                 teacher.setRegNo("T-" + String.format("%03d", i + 1));
-                teacher.setEmailAddress(teacherNames[i].toLowerCase().replace(" ", ".").replace(".", "") + "@university.edu");
+                teacher.setEmailAddress(
+                        teacherNames[i].toLowerCase().replace(" ", ".").replace(".", "") + "@university.edu");
                 teacher.setContactNumber("0300-" + String.format("%07d", 1000000 + i));
                 teacher.setGuardianNumber("0300-" + String.format("%07d", 2000000 + i));
                 teacher.setFatherName("Father of " + teacherNames[i]);
@@ -125,7 +126,7 @@ public class DataInitializer {
             }
 
             // ========== CREATE BATCHES ==========
-            String[] batchNames = {"Batch-A", "Batch-B", "Batch-C", "Batch-D", "Batch-E"};
+            String[] batchNames = { "Batch-A", "Batch-B", "Batch-C", "Batch-D", "Batch-E" };
             List<Batch> batches = new ArrayList<>();
             for (String batchName : batchNames) {
                 Batch batch = new Batch();
@@ -136,15 +137,15 @@ public class DataInitializer {
 
             // ========== CREATE 50 STUDENTS ==========
             String[] firstNames = {
-                "Ahsan", "Sara", "Ali", "Fatima", "Usman", "Ayesha", "Bilal", "Hina", "Zain", "Mariam",
-                "Hamza", "Aisha", "Omar", "Zara", "Hassan", "Layla", "Ibrahim", "Sana", "Yusuf", "Noor",
-                "Khalid", "Amina", "Tariq", "Hafsa", "Rashid", "Maryam", "Saad", "Zainab", "Faisal", "Ayesha",
-                "Nadeem", "Saima", "Waseem", "Rabia", "Junaid", "Sadia", "Adnan", "Nida", "Shahid", "Samia",
-                "Rizwan", "Tahira", "Kamran", "Sobia", "Farhan", "Nazia", "Imran", "Shazia", "Noman", "Saba"
+                    "Ahsan", "Sara", "Ali", "Fatima", "Usman", "Ayesha", "Bilal", "Hina", "Zain", "Mariam",
+                    "Hamza", "Aisha", "Omar", "Zara", "Hassan", "Layla", "Ibrahim", "Sana", "Yusuf", "Noor",
+                    "Khalid", "Amina", "Tariq", "Hafsa", "Rashid", "Maryam", "Saad", "Zainab", "Faisal", "Ayesha",
+                    "Nadeem", "Saima", "Waseem", "Rabia", "Junaid", "Sadia", "Adnan", "Nida", "Shahid", "Samia",
+                    "Rizwan", "Tahira", "Kamran", "Sobia", "Farhan", "Nazia", "Imran", "Shazia", "Noman", "Saba"
             };
             String[] lastNames = {
-                "Khan", "Ali", "Ahmed", "Hassan", "Malik", "Sheikh", "Raza", "Shah", "Abbas", "Butt",
-                "Iqbal", "Rashid", "Nawaz", "Chaudhry", "Mirza", "Baig", "Qureshi", "Hashmi", "Siddiqui", "Zaidi"
+                    "Khan", "Ali", "Ahmed", "Hassan", "Malik", "Sheikh", "Raza", "Shah", "Abbas", "Butt",
+                    "Iqbal", "Rashid", "Nawaz", "Chaudhry", "Mirza", "Baig", "Qureshi", "Hashmi", "Siddiqui", "Zaidi"
             };
 
             List<Student> students = new ArrayList<>();
@@ -172,7 +173,7 @@ public class DataInitializer {
                 student.setOffice365Email((firstName + "." + lastName).toLowerCase() + "@office365.university.edu");
                 student.setOffice365Pass("office365pass" + (i + 1));
                 String batchName = batchNames[i % batchNames.length];
-                student.setBatch(batchName);
+
                 student.setBatchEntity(batches.get(i % batches.size()));
                 student.setRollNo(batchName.replace("Batch-", "") + "-" + String.format("%02d", (i % 10) + 1));
                 students.add(student);
@@ -181,12 +182,12 @@ public class DataInitializer {
             System.out.println("Seeded " + savedStudents.size() + " students");
 
             // ========== CREATE COURSES ==========
-            String[] courseCodes = {"CS-101", "CS-102", "CS-201", "CS-202", "CS-301", "CS-302", "CS-401", "CS-402"};
+            String[] courseCodes = { "CS-101", "CS-102", "CS-201", "CS-202", "CS-301", "CS-302", "CS-401", "CS-402" };
             String[] courseNames = {
-                "Introduction to Programming", "Data Structures", "Object-Oriented Programming",
-                "Database Systems", "Web Development", "Software Engineering", "Machine Learning", "Cloud Computing"
+                    "Introduction to Programming", "Data Structures", "Object-Oriented Programming",
+                    "Database Systems", "Web Development", "Software Engineering", "Machine Learning", "Cloud Computing"
             };
-            Integer[] credits = {3, 3, 3, 3, 3, 3, 3, 3};
+            Integer[] credits = { 3, 3, 3, 3, 3, 3, 3, 3 };
 
             List<Course> courses = new ArrayList<>();
             for (int i = 0; i < courseCodes.length; i++) {
@@ -205,7 +206,8 @@ public class DataInitializer {
                 // Each course gets students from different batches
                 int studentsPerCourse = 20;
                 for (int i = 0; i < studentsPerCourse; i++) {
-                    Student student = savedStudents.get((course.getId().intValue() * studentsPerCourse + i) % savedStudents.size());
+                    Student student = savedStudents
+                            .get((course.getId().intValue() * studentsPerCourse + i) % savedStudents.size());
                     StudentCourseEnrollment enrollment = new StudentCourseEnrollment();
                     enrollment.setStudent(student);
                     enrollment.setCourse(course);
@@ -251,7 +253,8 @@ public class DataInitializer {
                 for (int i = 1; i <= 3; i++) {
                     Assignment assignment = new Assignment();
                     assignment.setTitle("Assignment " + i + " - " + course.getCourseName());
-                    assignment.setDescription("Complete the exercises related to " + course.getCourseName() + " topics.");
+                    assignment
+                            .setDescription("Complete the exercises related to " + course.getCourseName() + " topics.");
                     assignment.setDueDate(LocalDate.now().plusDays(7 + i * 7));
                     assignment.setTeacher(course.getTeacher());
                     assignment.setCourse(course);
@@ -262,17 +265,18 @@ public class DataInitializer {
 
             // ========== CREATE ANNOUNCEMENTS ==========
             String[] announcementMessages = {
-                "Midterm exam scheduled for next week. Please prepare accordingly.",
-                "Assignment submission deadline extended by 2 days.",
-                "Class will be held online tomorrow due to weather conditions.",
-                "Quiz will be conducted in the next class. Study chapters 1-5.",
-                "Project presentations will start from next Monday."
+                    "Midterm exam scheduled for next week. Please prepare accordingly.",
+                    "Assignment submission deadline extended by 2 days.",
+                    "Class will be held online tomorrow due to weather conditions.",
+                    "Quiz will be conducted in the next class. Study chapters 1-5.",
+                    "Project presentations will start from next Monday."
             };
             for (Course course : savedCourses) {
                 for (int i = 0; i < 2; i++) {
                     Announcement announcement = new Announcement();
                     announcement.setCourse(course);
-                    announcement.setMessage(announcementMessages[(course.getId().intValue() + i) % announcementMessages.length]);
+                    announcement.setMessage(
+                            announcementMessages[(course.getId().intValue() + i) % announcementMessages.length]);
                     announcement.setTimestamp(LocalDateTime.now().minusDays(i * 7));
                     announcementRepository.save(announcement);
                 }
@@ -281,15 +285,16 @@ public class DataInitializer {
 
             // ========== CREATE LEARNING RESOURCES ==========
             String[] resourceTitles = {
-                "Lecture Slides - Week 1", "Textbook Chapter 1", "Video Tutorial - Basics",
-                "Practice Problems Set", "Reference Material", "Lab Manual"
+                    "Lecture Slides - Week 1", "Textbook Chapter 1", "Video Tutorial - Basics",
+                    "Practice Problems Set", "Reference Material", "Lab Manual"
             };
             for (Course course : savedCourses) {
                 for (int i = 0; i < 3; i++) {
                     LearningResource resource = new LearningResource();
                     resource.setCourse(course);
                     resource.setTitle(resourceTitles[(course.getId().intValue() + i) % resourceTitles.length]);
-                    resource.setFileUrl("https://example.com/resources/" + course.getCourseNo() + "/resource" + (i + 1) + ".pdf");
+                    resource.setFileUrl(
+                            "https://example.com/resources/" + course.getCourseNo() + "/resource" + (i + 1) + ".pdf");
                     learningResourceRepository.save(resource);
                 }
             }
@@ -310,4 +315,3 @@ public class DataInitializer {
         };
     }
 }
-

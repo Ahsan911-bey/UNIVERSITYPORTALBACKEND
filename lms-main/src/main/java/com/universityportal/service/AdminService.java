@@ -25,10 +25,10 @@ public class AdminService {
     private final BatchRepository batchRepository;
 
     public AdminService(StudentRepository studentRepository,
-                        TeacherRepository teacherRepository,
-                        CourseRepository courseRepository,
-                        StudentCourseEnrollmentRepository enrollmentRepository,
-                        BatchRepository batchRepository) {
+            TeacherRepository teacherRepository,
+            CourseRepository courseRepository,
+            StudentCourseEnrollmentRepository enrollmentRepository,
+            BatchRepository batchRepository) {
         this.studentRepository = studentRepository;
         this.teacherRepository = teacherRepository;
         this.courseRepository = courseRepository;
@@ -38,6 +38,11 @@ public class AdminService {
 
     public StudentDto createStudent(StudentDto dto) {
         Student student = StudentMapper.toEntity(dto);
+        if (dto.getBatch() != null) {
+            Batch batch = batchRepository.findByNameIgnoreCase(dto.getBatch())
+                    .orElseThrow(() -> new IllegalArgumentException("Batch not found: " + dto.getBatch()));
+            student.setBatchEntity(batch);
+        }
         Student saved = studentRepository.save(student);
         return StudentMapper.toDto(saved);
     }
@@ -70,7 +75,7 @@ public class AdminService {
                     return batchRepository.save(b);
                 });
         for (Student student : students) {
-            student.setBatch(request.getBatch());
+
             student.setBatchEntity(batch);
         }
         List<Student> saved = studentRepository.saveAll(students);
@@ -132,5 +137,3 @@ public class AdminService {
                 .toList();
     }
 }
-
-

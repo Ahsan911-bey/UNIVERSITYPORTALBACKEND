@@ -18,9 +18,6 @@ public class Student extends User {
     private String office365Email;
     private String office365Pass;
 
-    @jakarta.persistence.Column(name = "legacy_batch")
-    private String batch; // legacy simple batch string (kept)
-
     private String rollNo;
 
     @ManyToOne
@@ -65,14 +62,6 @@ public class Student extends User {
         this.office365Pass = office365Pass;
     }
 
-    public String getBatch() {
-        return batch;
-    }
-
-    public void setBatch(String batch) {
-        this.batch = batch;
-    }
-
     public String getRollNo() {
         return rollNo;
     }
@@ -97,5 +86,3 @@ public class Student extends User {
         this.enrollments = enrollments;
     }
 }
-
-
