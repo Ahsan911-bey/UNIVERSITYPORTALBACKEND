@@ -190,7 +190,7 @@ public class DataInitializer {
                 student.setSemester(String.valueOf((i % 8) + 1));
                 student.setNationality("Pakistani");
                 student.setDob(LocalDate.of(2000 + (i % 5), (i % 12) + 1, (i % 28) + 1));
-                student.setProfilePic("https://example.com/student" + (i + 1) + ".jpg");
+                student.setProfilePic("https://pyxis.nymag.com/v1/imgs/a85/912/a5ef47190c966169cf6e9c6da815b0f0ad-07-john-wick-2-2.rsquare.w400.jpg");
                 student.setPassword("password");
                 student.setCgpa(2.5 + (random.nextDouble() * 2.5)); // CGPA between 2.5 and 5.0
                 student.setWifiAccount("wifi-" + (i + 1));
@@ -276,6 +276,10 @@ public class DataInitializer {
             System.out.println("Created attendance records for all enrollments");
 
             // ========== CREATE ASSIGNMENTS ==========
+            // Using the teacher-provided file at:
+            // C:\Users\Ahsan\Desktop\lms-main\lms-main\src\main\resources\filestorage\assignment.pdf
+            // set this path as the teacherFileUrl for all seeded assignments (mock teacher upload).
+            String teacherFilePath = "C:/Users/Ahsan/Desktop/lms-main/lms-main/src/main/resources/filestorage/assignment.pdf";
             for (Course course : savedCourses) {
                 for (int i = 1; i <= 3; i++) {
                     Assignment assignment = new Assignment();
@@ -285,10 +289,8 @@ public class DataInitializer {
                     assignment.setDueDate(LocalDate.now().plusDays(7 + i * 7));
                     assignment.setTeacher(course.getTeacher());
                     assignment.setCourse(course);
-                    // Set fileUrl for some assignments (teacher uploaded files)
-                    if (i % 2 == 0) {
-                        assignment.setFileUrl("assignment_" + course.getId() + "_" + i + ".pdf");
-                    }
+                    // Set teacherFileUrl to the provided local assignment file for all assignments
+                    assignment.setFileUrl(teacherFilePath);
                     assignmentRepository.save(assignment);
                 }
             }
