@@ -48,6 +48,7 @@ public class StudentService {
                 .filter(e -> e.getMarks() != null)
                 .map(e -> {
                     StudentCourseMarksDto dto = new StudentCourseMarksDto();
+                    dto.setCourseId(e.getCourse().getId());
                     dto.setCourseName(e.getCourse().getCourseName());
                     dto.setQuizMarks(e.getMarks().getQuizMarks());
                     dto.setAssignmentMarks(e.getMarks().getAssignmentMarks());
@@ -65,6 +66,7 @@ public class StudentService {
                 .filter(e -> e.getAttendance() != null)
                 .map(e -> {
                     StudentCourseAttendanceSummaryDto dto = new StudentCourseAttendanceSummaryDto();
+                    dto.setCourseId(e.getCourse().getId());
                     dto.setCourseName(e.getCourse().getCourseName());
                     dto.setTotalClasses(e.getAttendance().getTotalClasses());
                     dto.setPresents(e.getAttendance().getPresents());

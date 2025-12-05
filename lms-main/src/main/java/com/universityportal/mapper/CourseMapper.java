@@ -2,7 +2,6 @@ package com.universityportal.mapper;
 
 import com.universityportal.dto.CourseDto;
 import com.universityportal.entity.Course;
-import com.universityportal.entity.Announcement;
 
 public class CourseMapper {
 

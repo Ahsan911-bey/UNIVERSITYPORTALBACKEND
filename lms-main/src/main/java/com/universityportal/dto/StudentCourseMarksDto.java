@@ -2,6 +2,7 @@ package com.universityportal.dto;
 
 public class StudentCourseMarksDto {
 
+    private Long courseId;
     private String courseName;
     private Double quizMarks;
     private Double assignmentMarks;
@@ -9,6 +10,14 @@ public class StudentCourseMarksDto {
     private Double finalMarks;
 
     public StudentCourseMarksDto() {
+    }
+
+    public Long getCourseId() {
+        return courseId;
+    }
+
+    public void setCourseId(Long courseId) {
+        this.courseId = courseId;
     }
 
     public String getCourseName() {
