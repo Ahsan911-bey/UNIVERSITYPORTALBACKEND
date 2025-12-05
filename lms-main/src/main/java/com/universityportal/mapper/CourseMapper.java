@@ -2,6 +2,7 @@ package com.universityportal.mapper;
 
 import com.universityportal.dto.CourseDto;
 import com.universityportal.entity.Course;
+import com.universityportal.entity.Announcement;
 
 public class CourseMapper {
 
@@ -21,6 +22,11 @@ public class CourseMapper {
             dto.setTeacherId(course.getTeacher().getId());
         }
         // studentIds can be derived from enrollments if needed; keep empty here for simplicity
+        if (course.getAnnouncements() != null) {
+            dto.setAnnouncements(course.getAnnouncements().stream()
+                    .map(AnnouncementMapper::toDto)
+                    .toList());
+        }
         return dto;
     }
 
