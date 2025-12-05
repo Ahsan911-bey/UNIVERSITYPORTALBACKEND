@@ -64,9 +64,9 @@ public class DataInitializer {
             admin.setGuardianNumber("0300-0000002");
             admin.setFatherName("Admin Father");
             admin.setProgram("Administration");
-            admin.setSession("2020-2024");
+            admin.setSession("FA23");
             admin.setSemester("N/A");
-            admin.setCampus("Main");
+            admin.setCampus("ISL");
             admin.setClassName("Admin Office");
             admin.setNationality("Pakistani");
             admin.setDob(LocalDate.of(1975, 1, 1));
@@ -94,8 +94,10 @@ public class DataInitializer {
                     "Network Security", "Data Structures"
             };
             String[] programs = { "Computer Science", "Software Engineering", "Information Technology" };
-            String[] sessions = { "2020-2024", "2021-2025", "2022-2026" };
-            String[] campuses = { "Main", "North", "South" };
+            // teacher sessions (short codes)
+            String[] teacherSessions = { "SP25", "FA24", "SU24" };
+            // campus short codes
+            String[] teacherCampuses = { "SWL", "ISL", "LHR" };
 
             List<Teacher> teachers = new ArrayList<>();
             for (int i = 0; i < 10; i++) {
@@ -108,9 +110,9 @@ public class DataInitializer {
                 teacher.setGuardianNumber("0300-" + String.format("%07d", 2000000 + i));
                 teacher.setFatherName("Father of " + teacherNames[i]);
                 teacher.setProgram(programs[i % programs.length]);
-                teacher.setSession(sessions[i % sessions.length]);
+                teacher.setSession(teacherSessions[i % teacherSessions.length]);
                 teacher.setSemester(String.valueOf((i % 8) + 1));
-                teacher.setCampus(campuses[i % campuses.length]);
+                teacher.setCampus(teacherCampuses[i % teacherCampuses.length]);
                 teacher.setClassName("CS-" + (i % 8 + 1) + "A");
                 teacher.setNationality("Pakistani");
                 teacher.setDob(LocalDate.of(1970 + (i * 2), (i % 12) + 1, (i % 28) + 1));
@@ -148,6 +150,18 @@ public class DataInitializer {
                     "Iqbal", "Rashid", "Nawaz", "Chaudhry", "Mirza", "Baig", "Qureshi", "Hashmi", "Siddiqui", "Zaidi"
             };
 
+            // Define per-batch values so each block of 10 shares session, className, campus, program
+            String[] sessionsPerBatch = { "SP25", "FA24", "SU24", "FA23", "SP23" };
+            String[] classNamesPerBatch = { "CS-1A", "CS-2A", "CS-3A", "CS-4A", "CS-5A" };
+            String[] campusesPerBatch = { "SWL", "ISL", "LHR", "SWL", "ISL" };
+            String[] programsPerBatch = {
+                    "Computer Science",
+                    "Software Engineering",
+                    "Information Technology",
+                    "Computer Science",
+                    "Software Engineering"
+            };
+
             List<Student> students = new ArrayList<>();
             for (int i = 0; i < 50; i++) {
                 Student student = new Student();
@@ -159,11 +173,17 @@ public class DataInitializer {
                 student.setContactNumber("0300-" + String.format("%07d", 3000000 + i));
                 student.setGuardianNumber("0300-" + String.format("%07d", 4000000 + i));
                 student.setFatherName("Father of " + firstName + " " + lastName);
-                student.setProgram(programs[i % programs.length]);
-                student.setSession(sessions[i % sessions.length]);
+
+                // Determine which batch block (0..4) this student belongs to (each block = 10 students)
+                int batchIndex = Math.min(i / 10, batches.size() - 1);
+
+                // Assign program, session, campus, className the same for the entire block of 10
+                student.setProgram(programsPerBatch[batchIndex]);
+                student.setSession(sessionsPerBatch[batchIndex]);
+                student.setCampus(campusesPerBatch[batchIndex]);
+                student.setClassName(classNamesPerBatch[batchIndex]);
+
                 student.setSemester(String.valueOf((i % 8) + 1));
-                student.setCampus(campuses[i % campuses.length]);
-                student.setClassName("CS-" + ((i % 8) + 1) + "A");
                 student.setNationality("Pakistani");
                 student.setDob(LocalDate.of(2000 + (i % 5), (i % 12) + 1, (i % 28) + 1));
                 student.setProfilePic("https://example.com/student" + (i + 1) + ".jpg");
@@ -172,10 +192,13 @@ public class DataInitializer {
                 student.setWifiAccount("wifi-" + (i + 1));
                 student.setOffice365Email((firstName + "." + lastName).toLowerCase() + "@office365.university.edu");
                 student.setOffice365Pass("office365pass" + (i + 1));
-                String batchName = batchNames[i % batchNames.length];
 
-                student.setBatchEntity(batches.get(i % batches.size()));
-                student.setRollNo(batchName.replace("Batch-", "") + "-" + String.format("%02d", (i % 10) + 1));
+                // Assign batch entity (blocks of 10)
+                Batch assignedBatch = batches.get(batchIndex);
+                student.setBatchEntity(assignedBatch);
+
+                // Roll number within batch: 01..10
+                student.setRollNo(assignedBatch.getName().replace("Batch-", "") + "-" + String.format("%02d", (i % 10) + 1));
                 students.add(student);
             }
             List<Student> savedStudents = studentRepository.saveAll(students);
@@ -203,7 +226,7 @@ public class DataInitializer {
 
             // ========== ENROLL STUDENTS INTO COURSES ==========
             for (Course course : savedCourses) {
-                // Each course gets students from different batches
+                // Each course gets a fixed number of students
                 int studentsPerCourse = 20;
                 for (int i = 0; i < studentsPerCourse; i++) {
                     Student student = savedStudents
@@ -229,11 +252,10 @@ public class DataInitializer {
                 enrollment.setMarks(marks);
                 marksRepository.save(marks);
             }
-            System.out.println("Created marks for enrollments");
+            System.out.println("Created marks for up to 100 enrollments");
 
-            // ========== CREATE ATTENDANCE FOR SOME ENROLLMENTS ==========
-            for (int i = 0; i < Math.min(100, allEnrollments.size()); i++) {
-                StudentCourseEnrollment enrollment = allEnrollments.get(i);
+            // ========== CREATE ATTENDANCE FOR ALL ENROLLMENTS ==========
+            for (StudentCourseEnrollment enrollment : allEnrollments) {
                 Attendance attendance = new Attendance();
                 int totalClasses = 30 + random.nextInt(10);
                 int presents = (int) (totalClasses * (0.7 + random.nextDouble() * 0.25)); // 70-95% attendance
@@ -243,10 +265,11 @@ public class DataInitializer {
                 attendance.setAbsents(absents);
                 attendance.setPreviousAttendance("Regular attendance maintained.");
                 attendance.setStudentCourseEnrollment(enrollment);
-                enrollment.setAttendance(attendance);
                 attendanceRepository.save(attendance);
+                enrollment.setAttendance(attendance);
+                enrollmentRepository.save(enrollment);
             }
-            System.out.println("Created attendance records");
+            System.out.println("Created attendance records for all enrollments");
 
             // ========== CREATE ASSIGNMENTS ==========
             for (Course course : savedCourses) {
