@@ -27,6 +27,9 @@ public class Student extends User {
     @OneToMany(mappedBy = "student", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
     private List<StudentCourseEnrollment> enrollments = new ArrayList<>();
 
+    @OneToMany(mappedBy = "student", cascade = jakarta.persistence.CascadeType.ALL, orphanRemoval = true)
+    private List<StudentSubmission> submissions = new ArrayList<>();
+
     public Student() {
     }
 
@@ -84,5 +87,13 @@ public class Student extends User {
 
     public void setEnrollments(List<StudentCourseEnrollment> enrollments) {
         this.enrollments = enrollments;
+    }
+
+    public List<StudentSubmission> getSubmissions() {
+        return submissions;
+    }
+
+    public void setSubmissions(List<StudentSubmission> submissions) {
+        this.submissions = submissions;
     }
 }

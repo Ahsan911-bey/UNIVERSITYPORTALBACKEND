@@ -5,6 +5,19 @@ This document lists all available API endpoints for the University Portal, along
 ## Base URL
 `http://localhost:8080`
 
+## 0. File Management (`/files`)
+Use these endpoints for file upload and download operations.
+
+| Method | Endpoint | Description | Example URL |
+| :--- | :--- | :--- | :--- |
+| `POST` | `/files/upload` | Upload a file (multipart/form-data) | `/files/upload` |
+| `GET` | `/files/download?path={filename}` | Download a file | `/files/download?path=abc123.pdf` |
+
+**Upload File (`POST /files/upload`)**
+- Content-Type: `multipart/form-data`
+- Form field: `file`
+- Returns: filename string (use this as `fileUrl` in assignment/submission requests)
+
 ## 1. Student Portal (`/student`)
 Use these endpoints to view data for a specific student.
 **Seeded Student IDs**: 1 to 50
@@ -12,10 +25,10 @@ Use these endpoints to view data for a specific student.
 | Method | Endpoint | Description | Example URL |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/student/{studentId}` | Get student profile | `/student/1` |
-| `GET` | `/student/{studentId}/courses` | Get enrolled courses | `/student/1/courses` |
+| `GET` | `/student/{studentId}/courses` | Get enrolled courses (includes assignments) | `/student/1/courses` |
 | `GET` | `/student/{studentId}/marks` | Get marks for all courses | `/student/1/marks` |
 | `GET` | `/student/{studentId}/attendance` | Get attendance summary | `/student/1/attendance` |
-| `GET` | `/student/{studentId}/assignments` | Get assignment status | `/student/1/assignments` |
+| `POST` | `/student/assignment/submit` | Submit an assignment | *(See JSON Body below)* |
 
 ## 2. Teacher Portal (`/teacher`)
 Use these endpoints for teacher operations.
@@ -30,6 +43,7 @@ Use these endpoints for teacher operations.
 | `POST` | `/teacher/course/{courseId}/attendance` | Mark attendance for students | `/teacher/course/1/attendance` |
 | `POST` | `/teacher/announcement` | Create an announcement | *(See JSON Body below)* |
 | `POST` | `/teacher/assignment` | Create an assignment | *(See JSON Body below)* |
+| `GET` | `/teacher/assignment/{assignmentId}/submissions` | Get student submissions for an assignment | `/teacher/assignment/1/submissions` |
 | `POST` | `/teacher/marks` | Record marks for a student | *(See JSON Body below)* |
 
 ### Example JSON Bodies for Teacher POST Requests
@@ -63,9 +77,34 @@ Use these endpoints for teacher operations.
   "description": "Complete the lab manual.",
   "dueDate": "2024-12-31",
   "teacherId": 1,
-  "courseId": 1
+  "courseId": 1,
+  "fileUrl": "path/to/saved/file.pdf"
 }
 ```
+
+**Submit Assignment (`POST /student/assignment/submit`)**
+```json
+{
+  "studentId": 12,
+  "assignmentId": 5,
+  "fileUrl": "path/to/uploaded/student/file.pdf"
+}
+```
+
+**Get Assignment Submissions (`GET /teacher/assignment/{assignmentId}/submissions`)**
+Returns a list of student submissions for the specified assignment:
+```json
+[
+  {
+    "studentName": "Ahsan Khan",
+    "studentId": 12,
+    "fileUrl": "submission_12_5.pdf",
+    "submittedAt": "2024-12-15T10:30:00"
+  }
+]
+```
+
+**Note:** Assignments are now included in the `GET /student/{studentId}/courses` response. Each course object contains an `assignments` array with assignment details and status (pending/submitted/late).
 
 **Record Marks (`POST /teacher/marks`)**
 ```json

@@ -25,12 +25,14 @@ public class DataInitializer {
             AttendanceRepository attendanceRepository,
             AssignmentRepository assignmentRepository,
             StudentCourseEnrollmentRepository enrollmentRepository,
+            StudentSubmissionRepository studentSubmissionRepository,
             BatchRepository batchRepository,
             AnnouncementRepository announcementRepository,
             LearningResourceRepository learningResourceRepository,
             JdbcTemplate jdbcTemplate) {
         return args -> {
             // Clear existing data so we always start with the same mock dataset
+            studentSubmissionRepository.deleteAll();
             marksRepository.deleteAll();
             attendanceRepository.deleteAll();
             assignmentRepository.deleteAll();
@@ -283,10 +285,44 @@ public class DataInitializer {
                     assignment.setDueDate(LocalDate.now().plusDays(7 + i * 7));
                     assignment.setTeacher(course.getTeacher());
                     assignment.setCourse(course);
+                    // Set fileUrl for some assignments (teacher uploaded files)
+                    if (i % 2 == 0) {
+                        assignment.setFileUrl("assignment_" + course.getId() + "_" + i + ".pdf");
+                    }
                     assignmentRepository.save(assignment);
                 }
             }
             System.out.println("Created assignments for all courses");
+
+            // ========== CREATE STUDENT SUBMISSIONS (only for some students, some assignments) ==========
+            // Seed submissions for about 30% of student-assignment combinations
+            for (Student student : savedStudents) {
+                // Get courses this student is enrolled in
+                List<StudentCourseEnrollment> studentEnrollments = enrollmentRepository.findByStudentId(student.getId());
+                for (StudentCourseEnrollment enrollment : studentEnrollments) {
+                    List<Assignment> courseAssignments = assignmentRepository.findByCourseId(enrollment.getCourse().getId());
+                    for (int i = 0; i < courseAssignments.size(); i++) {
+                        Assignment assignment = courseAssignments.get(i);
+                        // Only create submission for some assignments (simulating real scenario)
+                        if (random.nextDouble() < 0.3) {
+                            StudentSubmission submission = new StudentSubmission();
+                            submission.setStudent(student);
+                            submission.setAssignment(assignment);
+                            submission.setFileUrl("submission_" + student.getId() + "_" + assignment.getId() + ".pdf");
+                            // Set submittedAt - some before due date, some after
+                            if (random.nextDouble() < 0.7) {
+                                // Submitted on time (before or on due date)
+                                submission.setSubmittedAt(LocalDateTime.now().minusDays(random.nextInt(5)));
+                            } else {
+                                // Submitted late (after due date)
+                                submission.setSubmittedAt(LocalDateTime.now().plusDays(random.nextInt(3) + 1));
+                            }
+                            studentSubmissionRepository.save(submission);
+                        }
+                    }
+                }
+            }
+            System.out.println("Created student submissions (30% of possible combinations)");
 
             // ========== CREATE ANNOUNCEMENTS ==========
             String[] announcementMessages = {
@@ -340,6 +376,7 @@ public class DataInitializer {
             System.out.println("Marks: " + marksRepository.count());
             System.out.println("Attendance: " + attendanceRepository.count());
             System.out.println("Assignments: " + assignmentRepository.count());
+            System.out.println("Student Submissions: " + studentSubmissionRepository.count());
             System.out.println("Announcements: " + announcementRepository.count());
             System.out.println("Learning Resources: " + learningResourceRepository.count());
         };

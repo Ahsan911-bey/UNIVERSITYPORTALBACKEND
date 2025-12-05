@@ -23,6 +23,7 @@ public class AssignmentMapper {
         if (assignment.getCourse() != null) {
             dto.setCourseId(assignment.getCourse().getId());
         }
+        dto.setFileUrl(assignment.getFileUrl());
         return dto;
     }
 

@@ -24,6 +24,8 @@ public class AssignmentDto {
     @NotNull(message = "Course id is required")
     private Long courseId;
 
+    private String fileUrl;
+
     public AssignmentDto() {
     }
 
@@ -73,6 +75,14 @@ public class AssignmentDto {
 
     public void setCourseId(Long courseId) {
         this.courseId = courseId;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 }
 

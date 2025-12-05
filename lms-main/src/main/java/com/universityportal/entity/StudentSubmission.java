@@ -2,6 +2,8 @@ package com.universityportal.entity;
 
 import jakarta.persistence.*;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Table(name = "student_submissions")
 public class StudentSubmission {
@@ -11,15 +13,15 @@ public class StudentSubmission {
     private Long id;
 
     @ManyToOne
+    @JoinColumn(name = "student_id")
+    private Student student;
+
+    @ManyToOne
     @JoinColumn(name = "assignment_id")
     private Assignment assignment;
 
-    @ManyToOne
-    @JoinColumn(name = "enrollment_id")
-    private StudentCourseEnrollment studentCourseEnrollment;
-
     private String fileUrl;
-    private String status; // submitted / pending / late
+    private LocalDateTime submittedAt;
 
     public StudentSubmission() {
     }
@@ -32,20 +34,20 @@ public class StudentSubmission {
         this.id = id;
     }
 
+    public Student getStudent() {
+        return student;
+    }
+
+    public void setStudent(Student student) {
+        this.student = student;
+    }
+
     public Assignment getAssignment() {
         return assignment;
     }
 
     public void setAssignment(Assignment assignment) {
         this.assignment = assignment;
-    }
-
-    public StudentCourseEnrollment getStudentCourseEnrollment() {
-        return studentCourseEnrollment;
-    }
-
-    public void setStudentCourseEnrollment(StudentCourseEnrollment studentCourseEnrollment) {
-        this.studentCourseEnrollment = studentCourseEnrollment;
     }
 
     public String getFileUrl() {
@@ -56,12 +58,12 @@ public class StudentSubmission {
         this.fileUrl = fileUrl;
     }
 
-    public String getStatus() {
-        return status;
+    public LocalDateTime getSubmittedAt() {
+        return submittedAt;
     }
 
-    public void setStatus(String status) {
-        this.status = status;
+    public void setSubmittedAt(LocalDateTime submittedAt) {
+        this.submittedAt = submittedAt;
     }
 }
 

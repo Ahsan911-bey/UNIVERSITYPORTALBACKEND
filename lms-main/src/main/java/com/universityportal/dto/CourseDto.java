@@ -23,6 +23,7 @@ public class CourseDto {
     private List<Long> studentIds = new ArrayList<>();
     private List<AnnouncementDto> announcements = new ArrayList<>();
     private List<LearningResourceDto> learningResources = new ArrayList<>();
+    private List<AssignmentWithStatusDto> assignments = new ArrayList<>();
 
     public CourseDto() {
     }
@@ -89,6 +90,14 @@ public class CourseDto {
 
     public void setLearningResources(List<LearningResourceDto> learningResources) {
         this.learningResources = learningResources;
+    }
+
+    public List<AssignmentWithStatusDto> getAssignments() {
+        return assignments;
+    }
+
+    public void setAssignments(List<AssignmentWithStatusDto> assignments) {
+        this.assignments = assignments;
     }
 }
 

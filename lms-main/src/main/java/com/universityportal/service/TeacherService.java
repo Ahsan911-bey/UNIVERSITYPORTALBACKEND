@@ -7,6 +7,7 @@ import com.universityportal.repository.*;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.universityportal.dto.StudentSubmissionResponseDto;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,6 +23,7 @@ public class TeacherService {
     private final AnnouncementRepository announcementRepository;
     private final StudentCourseEnrollmentRepository enrollmentRepository;
     private final BatchRepository batchRepository;
+    private final StudentSubmissionRepository submissionRepository;
 
     public TeacherService(CourseRepository courseRepository,
                           TeacherRepository teacherRepository,
@@ -31,7 +33,8 @@ public class TeacherService {
                           MarksRepository marksRepository,
                           AnnouncementRepository announcementRepository,
                           StudentCourseEnrollmentRepository enrollmentRepository,
-                          BatchRepository batchRepository) {
+                          BatchRepository batchRepository,
+                          StudentSubmissionRepository submissionRepository) {
         this.courseRepository = courseRepository;
         this.teacherRepository = teacherRepository;
         this.studentRepository = studentRepository;
@@ -41,6 +44,7 @@ public class TeacherService {
         this.announcementRepository = announcementRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.batchRepository = batchRepository;
+        this.submissionRepository = submissionRepository;
     }
 
     public List<CourseDto> getCoursesForTeacher(Long teacherId) {
@@ -120,8 +124,26 @@ public class TeacherService {
         Assignment assignment = AssignmentMapper.toEntity(dto);
         assignment.setTeacher(teacher);
         assignment.setCourse(course);
+        assignment.setFileUrl(dto.getFileUrl());
         Assignment saved = assignmentRepository.save(assignment);
         return AssignmentMapper.toDto(saved);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StudentSubmissionResponseDto> getAssignmentSubmissions(Long assignmentId) {
+        // Verify assignment exists
+        assignmentRepository.findById(assignmentId)
+                .orElseThrow(() -> new IllegalArgumentException("Assignment not found"));
+        
+        List<StudentSubmission> submissions = submissionRepository.findByAssignmentId(assignmentId);
+        return submissions.stream().map(submission -> {
+            StudentSubmissionResponseDto dto = new StudentSubmissionResponseDto();
+            dto.setStudentId(submission.getStudent().getId());
+            dto.setStudentName(submission.getStudent().getName());
+            dto.setFileUrl(submission.getFileUrl());
+            dto.setSubmittedAt(submission.getSubmittedAt());
+            return dto;
+        }).toList();
     }
 
     @Transactional

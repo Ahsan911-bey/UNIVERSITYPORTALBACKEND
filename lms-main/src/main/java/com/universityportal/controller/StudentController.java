@@ -2,6 +2,7 @@ package com.universityportal.controller;
 
 import com.universityportal.dto.*;
 import com.universityportal.service.StudentService;
+import jakarta.validation.Valid;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,10 +38,17 @@ public class StudentController {
         return ResponseEntity.ok(studentService.getStudentAttendance(studentId));
     }
 
-    @GetMapping("/{studentId}/assignments")
-    public ResponseEntity<List<StudentAssignmentStatusDto>> getAssignments(@PathVariable Long studentId) {
-        return ResponseEntity.ok(studentService.getStudentAssignments(studentId));
+    @PostMapping("/assignment/submit")
+    public ResponseEntity<Void> submitAssignment(@Valid @RequestBody StudentSubmissionDto dto) {
+        studentService.submitAssignment(dto);
+        return ResponseEntity.ok().build();
     }
+
+    // DEPRECATED: Assignments are now included in GET /student/{id}/courses
+    // @GetMapping("/{studentId}/assignments")
+    // public ResponseEntity<List<StudentAssignmentStatusDto>> getAssignments(@PathVariable Long studentId) {
+    //     return ResponseEntity.ok(studentService.getStudentAssignments(studentId));
+    // }
 
 }
 

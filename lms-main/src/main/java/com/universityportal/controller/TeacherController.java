@@ -53,6 +53,11 @@ public class TeacherController {
     public ResponseEntity<MarksDto> recordMarks(@Valid @RequestBody MarksDto dto) {
         return new ResponseEntity<>(teacherService.recordMarks(dto), HttpStatus.CREATED);
     }
+
+    @GetMapping("/assignment/{assignmentId}/submissions")
+    public ResponseEntity<List<StudentSubmissionResponseDto>> getAssignmentSubmissions(@PathVariable Long assignmentId) {
+        return ResponseEntity.ok(teacherService.getAssignmentSubmissions(assignmentId));
+    }
 }
 
 

@@ -18,6 +18,7 @@ public class Assignment {
     @Column(length = 1000)
     private String description;
     private LocalDate dueDate;
+    private String fileUrl;
 
     @ManyToOne
     @JoinColumn(name = "teacher_id")
@@ -63,6 +64,14 @@ public class Assignment {
 
     public void setDueDate(LocalDate dueDate) {
         this.dueDate = dueDate;
+    }
+
+    public String getFileUrl() {
+        return fileUrl;
+    }
+
+    public void setFileUrl(String fileUrl) {
+        this.fileUrl = fileUrl;
     }
 
     public Teacher getTeacher() {
