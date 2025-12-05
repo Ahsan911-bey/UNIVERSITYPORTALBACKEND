@@ -22,6 +22,7 @@ public class CourseDto {
     private Long teacherId;
     private List<Long> studentIds = new ArrayList<>();
     private List<AnnouncementDto> announcements = new ArrayList<>();
+    private List<LearningResourceDto> learningResources = new ArrayList<>();
 
     public CourseDto() {
     }
@@ -80,6 +81,14 @@ public class CourseDto {
 
     public void setAnnouncements(List<AnnouncementDto> announcements) {
         this.announcements = announcements;
+    }
+
+    public List<LearningResourceDto> getLearningResources() {
+        return learningResources;
+    }
+
+    public void setLearningResources(List<LearningResourceDto> learningResources) {
+        this.learningResources = learningResources;
     }
 }
 

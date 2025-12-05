@@ -64,8 +64,10 @@ public class DataInitializer {
             admin.setGuardianNumber("0300-0000002");
             admin.setFatherName("Admin Father");
             admin.setProgram("Administration");
+            // Use concise session codes (e.g., SP25, FA23)
             admin.setSession("FA23");
             admin.setSemester("N/A");
+            // Use campus short codes (SWL, ISL, LHR)
             admin.setCampus("ISL");
             admin.setClassName("Admin Office");
             admin.setNationality("Pakistani");
@@ -307,21 +309,26 @@ public class DataInitializer {
             System.out.println("Created announcements for all courses");
 
             // ========== CREATE LEARNING RESOURCES ==========
+            // Each course should now have exactly 2 learning resources using the provided YouTube links.
             String[] resourceTitles = {
-                    "Lecture Slides - Week 1", "Textbook Chapter 1", "Video Tutorial - Basics",
-                    "Practice Problems Set", "Reference Material", "Lab Manual"
+                    "Introductory Video",
+                    "Supplementary Video"
+            };
+            String[] resourceUrls = {
+                    "https://www.youtube.com/watch?v=nKE8pqvhrs8",
+                    "https://www.youtube.com/watch?v=gJrjgg1KVL4"
             };
             for (Course course : savedCourses) {
-                for (int i = 0; i < 3; i++) {
+                for (int i = 0; i < resourceUrls.length; i++) {
                     LearningResource resource = new LearningResource();
                     resource.setCourse(course);
-                    resource.setTitle(resourceTitles[(course.getId().intValue() + i) % resourceTitles.length]);
-                    resource.setFileUrl(
-                            "https://example.com/resources/" + course.getCourseNo() + "/resource" + (i + 1) + ".pdf");
+                    // Provide a descriptive title combining course name and resource title
+                    resource.setTitle(course.getCourseNo() + " - " + resourceTitles[i]);
+                    resource.setFileUrl(resourceUrls[i]);
                     learningResourceRepository.save(resource);
                 }
             }
-            System.out.println("Created learning resources for all courses");
+            System.out.println("Created 2 learning resources (YouTube links) for each course");
 
             System.out.println("\n=== DATA SEEDING COMPLETE ===");
             System.out.println("Admin: 1");

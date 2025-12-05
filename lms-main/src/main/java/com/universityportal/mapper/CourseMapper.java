@@ -26,6 +26,11 @@ public class CourseMapper {
                     .map(AnnouncementMapper::toDto)
                     .toList());
         }
+        if (course.getLearningResources() != null) {
+            dto.setLearningResources(course.getLearningResources().stream()
+                    .map(LearningResourceMapper::toDto)
+                    .toList());
+        }
         return dto;
     }
 
