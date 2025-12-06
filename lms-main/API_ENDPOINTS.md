@@ -45,6 +45,8 @@ Use these endpoints for teacher operations.
 | `POST` | `/teacher/assignment` | Create an assignment | *(See JSON Body below)* |
 | `GET` | `/teacher/assignment/{assignmentId}/submissions` | Get student submissions for an assignment | `/teacher/assignment/1/submissions` |
 | `POST` | `/teacher/marks` | Record marks for a student | *(See JSON Body below)* |
+| `GET` | `/teacher/{teacherId}` | Get teacher profile | `/teacher/2` |
+| `DELETE` | `/teacher/delannouncement/{id}` | Delete an announcement by ID | `/teacher/delannouncement/2` |
 
 ### Example JSON Bodies for Teacher POST Requests
 
@@ -133,6 +135,29 @@ Use these endpoints for administrative tasks.
 | `POST` | `/admin/course/assign-students` | Assign students to course | *(See JSON Body below)* |
 
 ### Example JSON Bodies for Admin POST Requests
+
+**Create Teacher (`POST /admin/teacher`)**
+```json
+{
+  "name": "Prof. Sara Khan",
+  "regNo": "T-011",
+  "emailAddress": "sara.khan@university.edu",
+  "contactNumber": "0300-1234567",
+  "guardianNumber": "0300-7654321",
+  "fatherName": "Khan Senior",
+  "program": "Computer Science",
+  "session": "FA24",
+  "semester": "3",
+  "campus": "ISL",
+  "className": "CS-3A",
+  "nationality": "Pakistani",
+  "dob": "1985-06-15",
+  "profilePic": "https://example.com/teacher11.jpg",
+  "password": "secret123",
+  "qualification": "MSCS",
+  "specialization": "Web Development"
+}
+```
 
 **Create Student (`POST /admin/student`)**
 ```json

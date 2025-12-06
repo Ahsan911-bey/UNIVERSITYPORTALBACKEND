@@ -1,5 +1,6 @@
 package com.universityportal.mapper;
 
+import com.universityportal.dto.AssignmentWithStatusDto;
 import com.universityportal.dto.CourseDto;
 import com.universityportal.entity.Course;
 
@@ -20,7 +21,13 @@ public class CourseMapper {
         if (course.getTeacher() != null) {
             dto.setTeacherId(course.getTeacher().getId());
         }
-        // studentIds can be derived from enrollments if needed; keep empty here for simplicity
+        // Derive studentIds from enrollments
+        if (course.getEnrollments() != null) {
+            dto.setStudentIds(course.getEnrollments().stream()
+                    .filter(enrollment -> enrollment.getStudent() != null && enrollment.getStudent().getId() != null)
+                    .map(enrollment -> enrollment.getStudent().getId())
+                    .toList());
+        }
         if (course.getAnnouncements() != null) {
             dto.setAnnouncements(course.getAnnouncements().stream()
                     .map(AnnouncementMapper::toDto)
@@ -29,6 +36,22 @@ public class CourseMapper {
         if (course.getLearningResources() != null) {
             dto.setLearningResources(course.getLearningResources().stream()
                     .map(LearningResourceMapper::toDto)
+                    .toList());
+        }
+        if (course.getAssignments() != null) {
+            dto.setAssignments(course.getAssignments().stream()
+                    .map(assignment -> {
+                        AssignmentWithStatusDto statusDto = new AssignmentWithStatusDto();
+                        statusDto.setId(assignment.getId());
+                        statusDto.setTitle(assignment.getTitle());
+                        statusDto.setDescription(assignment.getDescription());
+                        statusDto.setDueDate(assignment.getDueDate());
+                        statusDto.setTeacherFileUrl(assignment.getFileUrl());
+                        statusDto.setTeacherSubmitted(true);
+                        statusDto.setStudentSubmissionFileUrl(null);
+                        statusDto.setStatus("pending");
+                        return statusDto;
+                    })
                     .toList());
         }
         return dto;

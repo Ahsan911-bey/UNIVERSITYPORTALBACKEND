@@ -24,6 +24,11 @@ public class TeacherController {
         return ResponseEntity.ok(teacherService.getCoursesForTeacher(teacherId));
     }
 
+    @GetMapping("/{teacherId}")
+    public ResponseEntity<TeacherDto> getTeacher(@PathVariable Long teacherId) {
+        return ResponseEntity.ok(teacherService.getTeacherById(teacherId));
+    }
+
     // Get students of a course within a batch (for teacher portal)
     @GetMapping("/courses/{courseCode}/{batchName}")
     public ResponseEntity<List<SimpleStudentDto>> getStudentsByCourseAndBatch(@PathVariable String courseCode,
@@ -57,6 +62,12 @@ public class TeacherController {
     @GetMapping("/assignment/{assignmentId}/submissions")
     public ResponseEntity<List<StudentSubmissionResponseDto>> getAssignmentSubmissions(@PathVariable Long assignmentId) {
         return ResponseEntity.ok(teacherService.getAssignmentSubmissions(assignmentId));
+    }
+
+    @DeleteMapping("/delannouncement/{id}")
+    public ResponseEntity<Void> deleteAnnouncement(@PathVariable Long id) {
+        teacherService.deleteAnnouncement(id);
+        return ResponseEntity.noContent().build();
     }
 }
 

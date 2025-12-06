@@ -28,7 +28,6 @@ public class TeacherMapper {
         dto.setNationality(teacher.getNationality());
         dto.setDob(teacher.getDob());
         dto.setProfilePic(teacher.getProfilePic());
-        dto.setPassword(teacher.getPassword());
         dto.setQualification(teacher.getQualification());
         dto.setSpecialization(teacher.getSpecialization());
         return dto;

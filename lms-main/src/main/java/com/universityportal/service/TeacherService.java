@@ -53,6 +53,13 @@ public class TeacherService {
     }
 
     @Transactional(readOnly = true)
+    public TeacherDto getTeacherById(Long teacherId) {
+        Teacher teacher = teacherRepository.findById(teacherId)
+                .orElseThrow(() -> new IllegalArgumentException("Teacher not found"));
+        return TeacherMapper.toDto(teacher);
+    }
+
+    @Transactional(readOnly = true)
     public List<SimpleStudentDto> getStudentsByCourseAndBatch(String courseCode, String batchName) {
         Course course = courseRepository.findByCourseNo(courseCode)
                 .orElseThrow(() -> new IllegalArgumentException("Course not found"));
@@ -127,6 +134,13 @@ public class TeacherService {
         assignment.setFileUrl(dto.getFileUrl());
         Assignment saved = assignmentRepository.save(assignment);
         return AssignmentMapper.toDto(saved);
+    }
+
+    @Transactional
+    public void deleteAnnouncement(Long announcementId) {
+        Announcement announcement = announcementRepository.findById(announcementId)
+                .orElseThrow(() -> new IllegalArgumentException("Announcement not found"));
+        announcementRepository.delete(announcement);
     }
 
     @Transactional(readOnly = true)
