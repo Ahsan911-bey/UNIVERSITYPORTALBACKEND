@@ -74,7 +74,7 @@ public class DataInitializer {
             admin.setClassName("Admin Office");
             admin.setNationality("Pakistani");
             admin.setDob(LocalDate.of(1975, 1, 1));
-            admin.setProfilePic("https://example.com/admin.jpg");
+            admin.setProfilePic("https://pyxis.nymag.com/v1/imgs/a85/912/a5ef47190c966169cf6e9c6da815b0f0ad-07-john-wick-2-2.rsquare.w400.jpg");
             admin.setPassword("admin123");
             admin.setDesignation("Director");
             admin.setDepartment("IT Administration");
@@ -120,7 +120,7 @@ public class DataInitializer {
                 teacher.setClassName("CS-" + (i % 8 + 1) + "A");
                 teacher.setNationality("Pakistani");
                 teacher.setDob(LocalDate.of(1970 + (i * 2), (i % 12) + 1, (i % 28) + 1));
-                teacher.setProfilePic("https://example.com/teacher" + (i + 1) + ".jpg");
+                teacher.setProfilePic("https://pyxis.nymag.com/v1/imgs/a85/912/a5ef47190c966169cf6e9c6da815b0f0ad-07-john-wick-2-2.rsquare.w400.jpg");
                 teacher.setPassword("password");
                 teacher.setQualification(qualifications[i]);
                 teacher.setSpecialization(specializations[i]);
@@ -310,7 +310,7 @@ public class DataInitializer {
                             StudentSubmission submission = new StudentSubmission();
                             submission.setStudent(student);
                             submission.setAssignment(assignment);
-                            submission.setFileUrl("submission_" + student.getId() + "_" + assignment.getId() + ".pdf");
+                            submission.setFileUrl("C:/Users/Ahsan/Desktop/lms-main/lms-main/src/main/resources/filestorage/assignment.pdf");
                             // Set submittedAt - some before due date, some after
                             if (random.nextDouble() < 0.7) {
                                 // Submitted on time (before or on due date)

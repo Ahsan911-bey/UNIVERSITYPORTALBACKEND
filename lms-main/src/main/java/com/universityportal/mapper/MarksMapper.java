@@ -14,6 +14,14 @@ public class MarksMapper {
         }
         MarksDto dto = new MarksDto();
         dto.setId(marks.getId());
+        if (marks.getStudentCourseEnrollment() != null) {
+            if (marks.getStudentCourseEnrollment().getStudent() != null) {
+                dto.setStudentId(marks.getStudentCourseEnrollment().getStudent().getId());
+            }
+            if (marks.getStudentCourseEnrollment().getCourse() != null) {
+                dto.setCourseId(marks.getStudentCourseEnrollment().getCourse().getId());
+            }
+        }
         dto.setQuizMarks(marks.getQuizMarks());
         dto.setAssignmentMarks(marks.getAssignmentMarks());
         dto.setMidsMarks(marks.getMidsMarks());

@@ -12,16 +12,12 @@ public class MarksDto {
     @NotNull(message = "Course id is required")
     private Long courseId;
 
-    @NotNull(message = "Quiz marks are required")
     private Double quizMarks;
 
-    @NotNull(message = "Assignment marks are required")
     private Double assignmentMarks;
 
-    @NotNull(message = "Mids marks are required")
     private Double midsMarks;
 
-    @NotNull(message = "Final marks are required")
     private Double finalMarks;
 
     public MarksDto() {

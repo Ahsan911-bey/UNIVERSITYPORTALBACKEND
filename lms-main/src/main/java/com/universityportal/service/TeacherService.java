@@ -162,12 +162,31 @@ public class TeacherService {
 
     @Transactional
     public MarksDto recordMarks(MarksDto dto) {
-        Marks marks = MarksMapper.toEntity(dto);
         StudentCourseEnrollment enrollment = enrollmentRepository
                 .findByStudentIdAndCourseId(dto.getStudentId(), dto.getCourseId())
                 .orElseThrow(() -> new IllegalArgumentException("Enrollment not found"));
-        marks.setStudentCourseEnrollment(enrollment);
-        enrollment.setMarks(marks);
+
+        // Look up existing marks by enrollment to avoid duplicate insert
+        Marks marks = marksRepository.findByStudentCourseEnrollmentId(enrollment.getId())
+                .orElse(enrollment.getMarks());
+
+        if (marks == null) {
+            // Create new marks with only provided fields
+            marks = new Marks();
+            if (dto.getQuizMarks() != null) marks.setQuizMarks(dto.getQuizMarks());
+            if (dto.getAssignmentMarks() != null) marks.setAssignmentMarks(dto.getAssignmentMarks());
+            if (dto.getMidsMarks() != null) marks.setMidsMarks(dto.getMidsMarks());
+            if (dto.getFinalMarks() != null) marks.setFinalMarks(dto.getFinalMarks());
+            marks.setStudentCourseEnrollment(enrollment);
+            enrollment.setMarks(marks);
+        } else {
+            // Partial update of existing marks
+            if (dto.getQuizMarks() != null) marks.setQuizMarks(dto.getQuizMarks());
+            if (dto.getAssignmentMarks() != null) marks.setAssignmentMarks(dto.getAssignmentMarks());
+            if (dto.getMidsMarks() != null) marks.setMidsMarks(dto.getMidsMarks());
+            if (dto.getFinalMarks() != null) marks.setFinalMarks(dto.getFinalMarks());
+        }
+
         Marks saved = marksRepository.save(marks);
         return MarksMapper.toDto(saved);
     }
