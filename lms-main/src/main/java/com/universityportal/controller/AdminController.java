@@ -39,6 +39,11 @@ public class AdminController {
         return ResponseEntity.ok(adminService.assignStudentsToBatch(request));
     }
 
+    @PostMapping("/batch")
+    public ResponseEntity<BatchDto> createBatch(@RequestBody BatchDto dto) {
+        return new ResponseEntity<>(adminService.createBatch(dto), HttpStatus.CREATED);
+    }
+
     @PostMapping("/course/assign-teacher")
     public ResponseEntity<CourseDto> assignTeacher(@RequestBody CourseTeacherAssignmentRequest request) {
         return ResponseEntity.ok(adminService.assignTeacherToCourse(request));
@@ -60,6 +65,58 @@ public class AdminController {
     @GetMapping("/teachers")
     public ResponseEntity<List<TeacherDto>> getAllTeachers() {
         return ResponseEntity.ok(adminService.getAllTeachers());
+    }
+
+    // Get admin profile by ID
+    @GetMapping("/{adminId}")
+    public ResponseEntity<AdminDto> getAdmin(@PathVariable Long adminId) {
+        return ResponseEntity.ok(adminService.getAdminById(adminId));
+    }
+
+    // Get all students
+    @GetMapping("/students")
+    public ResponseEntity<List<StudentDto>> getAllStudents() {
+        return ResponseEntity.ok(adminService.getAllStudents());
+    }
+
+    // Get all courses
+    @GetMapping("/courses")
+    public ResponseEntity<List<CourseDto>> getAllCourses() {
+        return ResponseEntity.ok(adminService.getAllCourses());
+    }
+
+    // Get all batches
+    @GetMapping("/batches")
+    public ResponseEntity<List<BatchDto>> getAllBatches() {
+        return ResponseEntity.ok(adminService.getAllBatches());
+    }
+
+    // Delete student
+    @DeleteMapping("/student/{id}")
+    public ResponseEntity<Void> deleteStudent(@PathVariable Long id) {
+        adminService.deleteStudent(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Delete teacher
+    @DeleteMapping("/teacher/{id}")
+    public ResponseEntity<Void> deleteTeacher(@PathVariable Long id) {
+        adminService.deleteTeacher(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Delete batch
+    @DeleteMapping("/batch/{id}")
+    public ResponseEntity<Void> deleteBatch(@PathVariable Long id) {
+        adminService.deleteBatch(id);
+        return ResponseEntity.noContent().build();
+    }
+
+    // Delete course
+    @DeleteMapping("/course/{id}")
+    public ResponseEntity<Void> deleteCourse(@PathVariable Long id) {
+        adminService.deleteCourse(id);
+        return ResponseEntity.noContent().build();
     }
 }
 

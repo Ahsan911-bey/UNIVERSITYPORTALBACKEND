@@ -126,13 +126,22 @@ Use these endpoints for administrative tasks.
 | Method | Endpoint | Description | Example URL |
 | :--- | :--- | :--- | :--- |
 | `GET` | `/admin/teachers` | Get all teachers | `/admin/teachers` |
+| `GET` | `/admin/students` | Get all students | `/admin/students` |
+| `GET` | `/admin/courses` | Get all courses | `/admin/courses` |
+| `GET` | `/admin/batches` | Get all batches (names) | `/admin/batches` |
+| `GET` | `/admin/{adminId}` | Get admin profile by ID | `/admin/1` |
 | `GET` | `/admin/courses/{courseCode}/{batchName}` | Get students (Admin view) | `/admin/courses/CS-101/Batch-A` |
 | `POST` | `/admin/student` | Create a new student | *(See JSON Body below)* |
 | `POST` | `/admin/teacher` | Create a new teacher | *(See JSON Body below)* |
 | `POST` | `/admin/course` | Create a new course | *(See JSON Body below)* |
+| `POST` | `/admin/batch` | Create a new batch | *(See JSON Body below)* |
 | `POST` | `/admin/batch/assign` | Assign students to a batch | *(See JSON Body below)* |
 | `POST` | `/admin/course/assign-teacher` | Assign teacher to course | *(See JSON Body below)* |
 | `POST` | `/admin/course/assign-students` | Assign students to course | *(See JSON Body below)* |
+| `DELETE` | `/admin/student/{id}` | Delete a student by ID | `/admin/student/12` |
+| `DELETE` | `/admin/teacher/{id}` | Delete a teacher by ID | `/admin/teacher/3` |
+| `DELETE` | `/admin/batch/{id}` | Delete a batch by ID | `/admin/batch/5` |
+| `DELETE` | `/admin/course/{id}` | Delete a course by ID | `/admin/course/8` |
 
 ### Example JSON Bodies for Admin POST Requests
 
@@ -174,6 +183,13 @@ Use these endpoints for administrative tasks.
   "dob": "2005-01-01",
   "password": "password123",
   "batch": "Batch-A"
+}
+```
+
+**Create Batch (`POST /admin/batch`)**
+```json
+{
+  "name": "Batch-F"
 }
 ```
 

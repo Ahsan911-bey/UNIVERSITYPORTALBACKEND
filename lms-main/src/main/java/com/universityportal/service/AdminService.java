@@ -3,9 +3,12 @@ package com.universityportal.service;
 import com.universityportal.dto.*;
 import com.universityportal.entity.*;
 import com.universityportal.mapper.CourseMapper;
+import com.universityportal.mapper.AdminMapper;
 import com.universityportal.mapper.StudentMapper;
 import com.universityportal.mapper.TeacherMapper;
+import com.universityportal.mapper.BatchMapper;
 import com.universityportal.repository.BatchRepository;
+import com.universityportal.repository.AdminRepository;
 import com.universityportal.repository.CourseRepository;
 import com.universityportal.repository.StudentCourseEnrollmentRepository;
 import com.universityportal.repository.StudentRepository;
@@ -23,17 +26,20 @@ public class AdminService {
     private final CourseRepository courseRepository;
     private final StudentCourseEnrollmentRepository enrollmentRepository;
     private final BatchRepository batchRepository;
+    private final AdminRepository adminRepository;
 
     public AdminService(StudentRepository studentRepository,
             TeacherRepository teacherRepository,
             CourseRepository courseRepository,
             StudentCourseEnrollmentRepository enrollmentRepository,
-            BatchRepository batchRepository) {
+            BatchRepository batchRepository,
+            AdminRepository adminRepository) {
         this.studentRepository = studentRepository;
         this.teacherRepository = teacherRepository;
         this.courseRepository = courseRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.batchRepository = batchRepository;
+        this.adminRepository = adminRepository;
     }
 
     public StudentDto createStudent(StudentDto dto) {
@@ -135,5 +141,61 @@ public class AdminService {
         return teacherRepository.findAll().stream()
                 .map(TeacherMapper::toDto)
                 .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public AdminDto getAdminById(Long adminId) {
+        Admin admin = adminRepository.findById(adminId)
+                .orElseThrow(() -> new IllegalArgumentException("Admin not found"));
+        return AdminMapper.toDto(admin);
+    }
+
+    @Transactional(readOnly = true)
+    public List<StudentDto> getAllStudents() {
+        return studentRepository.findAll().stream()
+                .map(StudentMapper::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<CourseDto> getAllCourses() {
+        return courseRepository.findAll().stream()
+                .map(CourseMapper::toDto)
+                .toList();
+    }
+
+    @Transactional(readOnly = true)
+    public List<BatchDto> getAllBatches() {
+        return batchRepository.findAll().stream()
+                .map(BatchMapper::toDto)
+                .toList();
+    }
+
+    @Transactional
+    public BatchDto createBatch(BatchDto dto) {
+        Batch batch = new Batch();
+        batch.setName(dto.getName());
+        Batch saved = batchRepository.save(batch);
+        return BatchMapper.toDto(saved);
+    }
+
+    @Transactional
+    public void deleteStudent(Long id) {
+        studentRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteTeacher(Long id) {
+        teacherRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteBatch(Long id) {
+        batchRepository.deleteById(id);
+    }
+
+    @Transactional
+    public void deleteCourse(Long id) {
+        courseRepository.deleteById(id);
     }
 }
