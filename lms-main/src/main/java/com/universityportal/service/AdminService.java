@@ -13,6 +13,8 @@ import com.universityportal.repository.CourseRepository;
 import com.universityportal.repository.StudentCourseEnrollmentRepository;
 import com.universityportal.repository.StudentRepository;
 import com.universityportal.repository.TeacherRepository;
+import com.universityportal.repository.AssignmentRepository;
+import com.universityportal.repository.StudentSubmissionRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -27,19 +29,25 @@ public class AdminService {
     private final StudentCourseEnrollmentRepository enrollmentRepository;
     private final BatchRepository batchRepository;
     private final AdminRepository adminRepository;
+    private final AssignmentRepository assignmentRepository;
+    private final StudentSubmissionRepository submissionRepository;
 
     public AdminService(StudentRepository studentRepository,
             TeacherRepository teacherRepository,
             CourseRepository courseRepository,
             StudentCourseEnrollmentRepository enrollmentRepository,
             BatchRepository batchRepository,
-            AdminRepository adminRepository) {
+            AdminRepository adminRepository,
+            AssignmentRepository assignmentRepository,
+            StudentSubmissionRepository submissionRepository) {
         this.studentRepository = studentRepository;
         this.teacherRepository = teacherRepository;
         this.courseRepository = courseRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.batchRepository = batchRepository;
         this.adminRepository = adminRepository;
+        this.assignmentRepository = assignmentRepository;
+        this.submissionRepository = submissionRepository;
     }
 
     public StudentDto createStudent(StudentDto dto) {
@@ -186,6 +194,21 @@ public class AdminService {
 
     @Transactional
     public void deleteTeacher(Long id) {
+        // Detach teacher from courses to avoid FK on courses.teacher_id
+        List<Course> coursesOfTeacher = courseRepository.findByTeacherId(id);
+        for (Course c : coursesOfTeacher) {
+            c.setTeacher(null);
+        }
+        courseRepository.saveAll(coursesOfTeacher);
+
+        // Delete assignments created by this teacher (and their student submissions)
+        List<Assignment> assignments = assignmentRepository.findByTeacherId(id);
+        for (Assignment a : assignments) {
+            submissionRepository.deleteAll(submissionRepository.findByAssignmentId(a.getId()));
+        }
+        assignmentRepository.deleteAll(assignments);
+
+        // Finally delete the teacher
         teacherRepository.deleteById(id);
     }
 

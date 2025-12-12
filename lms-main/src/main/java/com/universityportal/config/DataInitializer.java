@@ -209,19 +209,22 @@ public class DataInitializer {
             System.out.println("Seeded " + savedStudents.size() + " students");
 
             // ========== CREATE COURSES ==========
-            String[] courseCodes = { "CS-101", "CS-102", "CS-201", "CS-202", "CS-301", "CS-302", "CS-401", "CS-402" };
-            String[] courseNames = {
-                    "Introduction to Programming", "Data Structures", "Object-Oriented Programming",
-                    "Database Systems", "Web Development", "Software Engineering", "Machine Learning", "Cloud Computing"
+            // Create 24 courses so each teacher (10) has 2–3 courses
+            String[] allCourseNames = {
+                    "Introduction to Programming", "Data Structures", "Object-Oriented Programming", "Database Systems",
+                    "Web Development", "Software Engineering", "Machine Learning", "Cloud Computing",
+                    "Operating Systems", "Computer Networks", "Discrete Mathematics", "Compiler Construction",
+                    "Human Computer Interaction", "Information Security", "Mobile Application Development", "Big Data Analytics",
+                    "Artificial Intelligence", "Distributed Systems", "Digital Logic Design", "Computer Architecture",
+                    "Numerical Computing", "Parallel Computing", "Information Retrieval", "Computer Graphics"
             };
-            Integer[] credits = { 3, 3, 3, 3, 3, 3, 3, 3 };
-
             List<Course> courses = new ArrayList<>();
-            for (int i = 0; i < courseCodes.length; i++) {
+            for (int i = 0; i < allCourseNames.length; i++) {
                 Course course = new Course();
-                course.setCourseNo(courseCodes[i]);
-                course.setCourseName(courseNames[i]);
-                course.setCredits(credits[i]);
+                course.setCourseNo("CS-" + (101 + i));
+                course.setCourseName(allCourseNames[i]);
+                course.setCredits(3);
+                // Round-robin assign teachers; with 24 courses and 10 teachers, each gets 2–3
                 course.setTeacher(savedTeachers.get(i % savedTeachers.size()));
                 courses.add(course);
             }
@@ -229,19 +232,21 @@ public class DataInitializer {
             System.out.println("Seeded " + savedCourses.size() + " courses");
 
             // ========== ENROLL STUDENTS INTO COURSES ==========
-            for (Course course : savedCourses) {
-                // Each course gets a fixed number of students
-                int studentsPerCourse = 20;
-                for (int i = 0; i < studentsPerCourse; i++) {
-                    Student student = savedStudents
-                            .get((course.getId().intValue() * studentsPerCourse + i) % savedStudents.size());
+            // Ensure each student is enrolled in ~6 distinct courses
+            int coursesPerStudent = 6;
+            int totalCourses = savedCourses.size();
+            for (Student student : savedStudents) {
+                int startIndex = (int) ((student.getId() - 1) % totalCourses);
+                int step = Math.max(1, totalCourses / coursesPerStudent); // spread selections across catalog
+                for (int k = 0; k < coursesPerStudent; k++) {
+                    Course course = savedCourses.get((startIndex + k * step) % totalCourses);
                     StudentCourseEnrollment enrollment = new StudentCourseEnrollment();
                     enrollment.setStudent(student);
                     enrollment.setCourse(course);
                     enrollmentRepository.save(enrollment);
                 }
             }
-            System.out.println("Created enrollments for all courses");
+            System.out.println("Enrolled each student into " + coursesPerStudent + " courses");
 
             // ========== CREATE MARKS FOR SOME ENROLLMENTS ==========
             List<StudentCourseEnrollment> allEnrollments = enrollmentRepository.findAll();
