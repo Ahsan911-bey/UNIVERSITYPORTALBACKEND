@@ -200,3 +200,72 @@ Use these endpoints for administrative tasks.
   "batch": "Batch-B"
 }
 ```
+
+## 4. Authentication (`/auth`)
+Use these endpoints for user login validation. These endpoints only validate credentials and return a simple success or error response.
+
+### 4.1 Student Login
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/student/login` | Validate student credentials |
+
+Request Body
+
+```json
+{
+  "id": 12,
+  "regNo": "CS-123",
+  "password": "password123"
+}
+```
+
+Success Response
+
+```
+"Validated"
+```
+
+### 4.2 Teacher Login
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/teacher/login` | Validate teacher credentials |
+
+Request Body
+
+```json
+{
+  "id": 3,
+  "password": "secret123"
+}
+```
+
+Success Response
+
+```
+"Validated"
+```
+
+### 4.3 Admin Login
+| Method | Endpoint | Description |
+| :--- | :--- | :--- |
+| `POST` | `/admin/login` | Validate admin credentials |
+
+Request Body
+
+```json
+{
+  "id": 1,
+  "password": "admin123"
+}
+```
+
+Success Response
+
+```
+"Validated"
+```
+
+Notes
+
+- On invalid credentials the API returns an error message handled by `GlobalExceptionHandler`.
+- The frontend handles redirection after receiving `"Validated"`.
