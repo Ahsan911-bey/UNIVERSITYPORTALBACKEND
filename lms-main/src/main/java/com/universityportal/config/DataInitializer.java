@@ -74,7 +74,7 @@ public class DataInitializer {
             admin.setClassName("Admin Office");
             admin.setNationality("Pakistani");
             admin.setDob(LocalDate.of(1975, 1, 1));
-            admin.setProfilePic("https://pyxis.nymag.com/v1/imgs/a85/912/a5ef47190c966169cf6e9c6da815b0f0ad-07-john-wick-2-2.rsquare.w400.jpg");
+            admin.setProfilePic("https://i.pinimg.com/736x/92/a5/9d/92a59d1de006b99bce2a064f1234867c.jpg");
             admin.setPassword("admin123");
             admin.setDesignation("Director");
             admin.setDepartment("IT Administration");
@@ -120,7 +120,7 @@ public class DataInitializer {
                 teacher.setClassName("CS-" + (i % 8 + 1) + "A");
                 teacher.setNationality("Pakistani");
                 teacher.setDob(LocalDate.of(1970 + (i * 2), (i % 12) + 1, (i % 28) + 1));
-                teacher.setProfilePic("https://pyxis.nymag.com/v1/imgs/a85/912/a5ef47190c966169cf6e9c6da815b0f0ad-07-john-wick-2-2.rsquare.w400.jpg");
+                teacher.setProfilePic("https://i.pinimg.com/736x/02/ce/ee/02ceee8ad5f56722d5871a9bfe37b4d7.jpg");
                 teacher.setPassword("password");
                 teacher.setQualification(qualifications[i]);
                 teacher.setSpecialization(specializations[i]);
