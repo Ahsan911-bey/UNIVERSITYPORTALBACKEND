@@ -5,7 +5,8 @@ import com.universityportal.repository.*;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.core.io.ClassPathResource;
+import org.springframework.security.crypto.password.PasswordEncoder;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -14,12 +15,13 @@ import java.util.List;
 import java.util.Random;
 
 @Configuration
-public class DataInitializer {
+public class DatabaseSeeder {
 
     @Bean
     public CommandLineRunner seedData(StudentRepository studentRepository,
             TeacherRepository teacherRepository,
             AdminRepository adminRepository,
+            UserRepository userRepository,
             CourseRepository courseRepository,
             MarksRepository marksRepository,
             AttendanceRepository attendanceRepository,
@@ -29,32 +31,16 @@ public class DataInitializer {
             BatchRepository batchRepository,
             AnnouncementRepository announcementRepository,
             LearningResourceRepository learningResourceRepository,
-            JdbcTemplate jdbcTemplate) {
+            PasswordEncoder passwordEncoder) {
         return args -> {
-            // Clear existing data so we always start with the same mock dataset
-            studentSubmissionRepository.deleteAll();
-            marksRepository.deleteAll();
-            attendanceRepository.deleteAll();
-            assignmentRepository.deleteAll();
-            announcementRepository.deleteAll();
-            learningResourceRepository.deleteAll();
-            enrollmentRepository.deleteAll();
-            courseRepository.deleteAll();
-            studentRepository.deleteAll();
-            teacherRepository.deleteAll();
-            adminRepository.deleteAll();
-            batchRepository.deleteAll();
 
-            // Try to reset ID counters for H2 so IDs start from 1 again (for easy testing)
-            try {
-                jdbcTemplate.execute("ALTER TABLE students ALTER COLUMN id RESTART WITH 1");
-                jdbcTemplate.execute("ALTER TABLE teachers ALTER COLUMN id RESTART WITH 1");
-                jdbcTemplate.execute("ALTER TABLE courses ALTER COLUMN id RESTART WITH 1");
-                jdbcTemplate.execute("ALTER TABLE batches ALTER COLUMN id RESTART WITH 1");
-            } catch (Exception ex) {
-                System.out.println("Could not reset H2 ID sequences: " + ex.getMessage());
+            // SAFETY CHECK: Only seed if the database is effectively empty (no users)
+            if (userRepository.count() > 0) {
+                System.out.println("Database already contains data. Seeding skipped.");
+                return;
             }
 
+            System.out.println("Starting Database Seeding...");
             Random random = new Random(42); // Fixed seed for reproducibility
 
             // ========== CREATE ADMIN ==========
@@ -66,20 +52,18 @@ public class DataInitializer {
             admin.setGuardianNumber("0300-0000002");
             admin.setFatherName("Admin Father");
             admin.setProgram("Administration");
-            // Use concise session codes (e.g., SP25, FA23)
             admin.setSession("FA23");
             admin.setSemester("N/A");
-            // Use campus short codes (SWL, ISL, LHR)
             admin.setCampus("ISL");
             admin.setClassName("Admin Office");
             admin.setNationality("Pakistani");
             admin.setDob(LocalDate.of(1975, 1, 1));
             admin.setProfilePic("https://i.pinimg.com/736x/92/a5/9d/92a59d1de006b99bce2a064f1234867c.jpg");
-            admin.setPassword("admin123");
+            admin.setPassword(passwordEncoder.encode("admin123"));
             admin.setDesignation("Director");
             admin.setDepartment("IT Administration");
             Admin savedAdmin = adminRepository.save(admin);
-            System.out.println("Seeded admin with id = " + savedAdmin.getId() + ", name = " + savedAdmin.getName());
+            System.out.println("Seeded admin.");
 
             // ========== CREATE 10 TEACHERS ==========
             String[] teacherNames = {
@@ -98,9 +82,7 @@ public class DataInitializer {
                     "Network Security", "Data Structures"
             };
             String[] programs = { "Computer Science", "Software Engineering", "Information Technology" };
-            // teacher sessions (short codes)
             String[] teacherSessions = { "SP25", "FA24", "SU24" };
-            // campus short codes
             String[] teacherCampuses = { "SWL", "ISL", "LHR" };
 
             List<Teacher> teachers = new ArrayList<>();
@@ -121,15 +103,13 @@ public class DataInitializer {
                 teacher.setNationality("Pakistani");
                 teacher.setDob(LocalDate.of(1970 + (i * 2), (i % 12) + 1, (i % 28) + 1));
                 teacher.setProfilePic("https://i.pinimg.com/736x/02/ce/ee/02ceee8ad5f56722d5871a9bfe37b4d7.jpg");
-                teacher.setPassword("password");
+                teacher.setPassword(passwordEncoder.encode("password"));
                 teacher.setQualification(qualifications[i]);
                 teacher.setSpecialization(specializations[i]);
                 teachers.add(teacher);
             }
             List<Teacher> savedTeachers = teacherRepository.saveAll(teachers);
-            for (Teacher t : savedTeachers) {
-                System.out.println("Seeded teacher with id = " + t.getId() + ", name = " + t.getName());
-            }
+            System.out.println("Seeded " + savedTeachers.size() + " teachers");
 
             // ========== CREATE BATCHES ==========
             String[] batchNames = { "Batch-A", "Batch-B", "Batch-C", "Batch-D", "Batch-E" };
@@ -139,7 +119,6 @@ public class DataInitializer {
                 batch.setName(batchName);
                 batches.add(batchRepository.save(batch));
             }
-            System.out.println("Seeded " + batches.size() + " batches");
 
             // ========== CREATE 50 STUDENTS ==========
             String[] firstNames = {
@@ -154,7 +133,6 @@ public class DataInitializer {
                     "Iqbal", "Rashid", "Nawaz", "Chaudhry", "Mirza", "Baig", "Qureshi", "Hashmi", "Siddiqui", "Zaidi"
             };
 
-            // Define per-batch values so each block of 10 shares session, className, campus, program
             String[] sessionsPerBatch = { "SP25", "FA24", "SU24", "FA23", "SP23" };
             String[] classNamesPerBatch = { "CS-1A", "CS-2A", "CS-3A", "CS-4A", "CS-5A" };
             String[] campusesPerBatch = { "SWL", "ISL", "LHR", "SWL", "ISL" };
@@ -178,10 +156,7 @@ public class DataInitializer {
                 student.setGuardianNumber("0300-" + String.format("%07d", 4000000 + i));
                 student.setFatherName("Father of " + firstName + " " + lastName);
 
-                // Determine which batch block (0..4) this student belongs to (each block = 10 students)
                 int batchIndex = Math.min(i / 10, batches.size() - 1);
-
-                // Assign program, session, campus, className the same for the entire block of 10
                 student.setProgram(programsPerBatch[batchIndex]);
                 student.setSession(sessionsPerBatch[batchIndex]);
                 student.setCampus(campusesPerBatch[batchIndex]);
@@ -190,31 +165,30 @@ public class DataInitializer {
                 student.setSemester(String.valueOf((i % 8) + 1));
                 student.setNationality("Pakistani");
                 student.setDob(LocalDate.of(2000 + (i % 5), (i % 12) + 1, (i % 28) + 1));
-                student.setProfilePic("https://pyxis.nymag.com/v1/imgs/a85/912/a5ef47190c966169cf6e9c6da815b0f0ad-07-john-wick-2-2.rsquare.w400.jpg");
-                student.setPassword("password");
-                student.setCgpa(2.5 + (random.nextDouble() * 2.5)); // CGPA between 2.5 and 5.0
+                student.setProfilePic(
+                        "https://pyxis.nymag.com/v1/imgs/a85/912/a5ef47190c966169cf6e9c6da815b0f0ad-07-john-wick-2-2.rsquare.w400.jpg");
+                student.setPassword(passwordEncoder.encode("password"));
+                student.setCgpa(2.5 + (random.nextDouble() * 2.5));
                 student.setWifiAccount("wifi-" + (i + 1));
                 student.setOffice365Email((firstName + "." + lastName).toLowerCase() + "@office365.university.edu");
                 student.setOffice365Pass("office365pass" + (i + 1));
 
-                // Assign batch entity (blocks of 10)
                 Batch assignedBatch = batches.get(batchIndex);
                 student.setBatchEntity(assignedBatch);
-
-                // Roll number within batch: 01..10
-                student.setRollNo(assignedBatch.getName().replace("Batch-", "") + "-" + String.format("%02d", (i % 10) + 1));
+                student.setRollNo(
+                        assignedBatch.getName().replace("Batch-", "") + "-" + String.format("%02d", (i % 10) + 1));
                 students.add(student);
             }
             List<Student> savedStudents = studentRepository.saveAll(students);
             System.out.println("Seeded " + savedStudents.size() + " students");
 
             // ========== CREATE COURSES ==========
-            // Create 24 courses so each teacher (10) has 2–3 courses
             String[] allCourseNames = {
                     "Introduction to Programming", "Data Structures", "Object-Oriented Programming", "Database Systems",
                     "Web Development", "Software Engineering", "Machine Learning", "Cloud Computing",
                     "Operating Systems", "Computer Networks", "Discrete Mathematics", "Compiler Construction",
-                    "Human Computer Interaction", "Information Security", "Mobile Application Development", "Big Data Analytics",
+                    "Human Computer Interaction", "Information Security", "Mobile Application Development",
+                    "Big Data Analytics",
                     "Artificial Intelligence", "Distributed Systems", "Digital Logic Design", "Computer Architecture",
                     "Numerical Computing", "Parallel Computing", "Information Retrieval", "Computer Graphics"
             };
@@ -224,20 +198,18 @@ public class DataInitializer {
                 course.setCourseNo("CS-" + (101 + i));
                 course.setCourseName(allCourseNames[i]);
                 course.setCredits(3);
-                // Round-robin assign teachers; with 24 courses and 10 teachers, each gets 2–3
                 course.setTeacher(savedTeachers.get(i % savedTeachers.size()));
                 courses.add(course);
             }
             List<Course> savedCourses = courseRepository.saveAll(courses);
             System.out.println("Seeded " + savedCourses.size() + " courses");
 
-            // ========== ENROLL STUDENTS INTO COURSES ==========
-            // Ensure each student is enrolled in ~6 distinct courses
+            // ========== ENROLL STUDENTS ==========
             int coursesPerStudent = 6;
             int totalCourses = savedCourses.size();
             for (Student student : savedStudents) {
                 int startIndex = (int) ((student.getId() - 1) % totalCourses);
-                int step = Math.max(1, totalCourses / coursesPerStudent); // spread selections across catalog
+                int step = Math.max(1, totalCourses / coursesPerStudent);
                 for (int k = 0; k < coursesPerStudent; k++) {
                     Course course = savedCourses.get((startIndex + k * step) % totalCourses);
                     StudentCourseEnrollment enrollment = new StudentCourseEnrollment();
@@ -246,9 +218,8 @@ public class DataInitializer {
                     enrollmentRepository.save(enrollment);
                 }
             }
-            System.out.println("Enrolled each student into " + coursesPerStudent + " courses");
 
-            // ========== CREATE MARKS FOR SOME ENROLLMENTS ==========
+            // ========== CREATE MARKS ==========
             List<StudentCourseEnrollment> allEnrollments = enrollmentRepository.findAll();
             for (int i = 0; i < Math.min(100, allEnrollments.size()); i++) {
                 StudentCourseEnrollment enrollment = allEnrollments.get(i);
@@ -261,13 +232,12 @@ public class DataInitializer {
                 enrollment.setMarks(marks);
                 marksRepository.save(marks);
             }
-            System.out.println("Created marks for up to 100 enrollments");
 
-            // ========== CREATE ATTENDANCE FOR ALL ENROLLMENTS ==========
+            // ========== CREATE ATTENDANCE ==========
             for (StudentCourseEnrollment enrollment : allEnrollments) {
                 Attendance attendance = new Attendance();
                 int totalClasses = 30 + random.nextInt(10);
-                int presents = (int) (totalClasses * (0.7 + random.nextDouble() * 0.25)); // 70-95% attendance
+                int presents = (int) (totalClasses * (0.7 + random.nextDouble() * 0.25));
                 int absents = totalClasses - presents;
                 attendance.setTotalClasses(totalClasses);
                 attendance.setPresents(presents);
@@ -278,13 +248,13 @@ public class DataInitializer {
                 enrollment.setAttendance(attendance);
                 enrollmentRepository.save(enrollment);
             }
-            System.out.println("Created attendance records for all enrollments");
 
             // ========== CREATE ASSIGNMENTS ==========
-            // Using the teacher-provided file at:
-            // C:\Users\Ahsan\Desktop\lms-main\lms-main\src\main\resources\filestorage\assignment.pdf
-            // set this path as the teacherFileUrl for all seeded assignments (mock teacher upload).
-            String teacherFilePath = "C:/Users/Ahsan/Desktop/lms-main/lms-main/src/main/resources/filestorage/assignment.pdf";
+            // Use relative path or a default string for now, to avoid C: constraints
+            // crashing on other OS
+            // In a real app, this should be a configurable property.
+            String teacherFilePath = "src/main/resources/filestorage/assignment.pdf";
+
             for (Course course : savedCourses) {
                 for (int i = 1; i <= 3; i++) {
                     Assignment assignment = new Assignment();
@@ -294,34 +264,28 @@ public class DataInitializer {
                     assignment.setDueDate(LocalDate.now().plusDays(7 + i * 7));
                     assignment.setTeacher(course.getTeacher());
                     assignment.setCourse(course);
-                    // Set teacherFileUrl to the provided local assignment file for all assignments
                     assignment.setFileUrl(teacherFilePath);
                     assignmentRepository.save(assignment);
                 }
             }
-            System.out.println("Created assignments for all courses");
 
-            // ========== CREATE STUDENT SUBMISSIONS (only for some students, some assignments) ==========
-            // Seed submissions for about 30% of student-assignment combinations
+            // ========== CREATE STUDENT SUBMISSIONS ==========
             for (Student student : savedStudents) {
-                // Get courses this student is enrolled in
-                List<StudentCourseEnrollment> studentEnrollments = enrollmentRepository.findByStudentId(student.getId());
+                List<StudentCourseEnrollment> studentEnrollments = enrollmentRepository
+                        .findByStudentId(student.getId());
                 for (StudentCourseEnrollment enrollment : studentEnrollments) {
-                    List<Assignment> courseAssignments = assignmentRepository.findByCourseId(enrollment.getCourse().getId());
+                    List<Assignment> courseAssignments = assignmentRepository
+                            .findByCourseId(enrollment.getCourse().getId());
                     for (int i = 0; i < courseAssignments.size(); i++) {
                         Assignment assignment = courseAssignments.get(i);
-                        // Only create submission for some assignments (simulating real scenario)
                         if (random.nextDouble() < 0.3) {
                             StudentSubmission submission = new StudentSubmission();
                             submission.setStudent(student);
                             submission.setAssignment(assignment);
-                            submission.setFileUrl("C:/Users/Ahsan/Desktop/lms-main/lms-main/src/main/resources/filestorage/assignment.pdf");
-                            // Set submittedAt - some before due date, some after
+                            submission.setFileUrl("src/main/resources/filestorage/assignment.pdf");
                             if (random.nextDouble() < 0.7) {
-                                // Submitted on time (before or on due date)
                                 submission.setSubmittedAt(LocalDateTime.now().minusDays(random.nextInt(5)));
                             } else {
-                                // Submitted late (after due date)
                                 submission.setSubmittedAt(LocalDateTime.now().plusDays(random.nextInt(3) + 1));
                             }
                             studentSubmissionRepository.save(submission);
@@ -329,7 +293,6 @@ public class DataInitializer {
                     }
                 }
             }
-            System.out.println("Created student submissions (30% of possible combinations)");
 
             // ========== CREATE ANNOUNCEMENTS ==========
             String[] announcementMessages = {
@@ -349,10 +312,8 @@ public class DataInitializer {
                     announcementRepository.save(announcement);
                 }
             }
-            System.out.println("Created announcements for all courses");
 
             // ========== CREATE LEARNING RESOURCES ==========
-            // Each course should now have exactly 2 learning resources using the provided YouTube links.
             String[] resourceTitles = {
                     "Introductory Video",
                     "Supplementary Video"
@@ -365,27 +326,13 @@ public class DataInitializer {
                 for (int i = 0; i < resourceUrls.length; i++) {
                     LearningResource resource = new LearningResource();
                     resource.setCourse(course);
-                    // Provide a descriptive title combining course name and resource title
                     resource.setTitle(course.getCourseNo() + " - " + resourceTitles[i]);
                     resource.setFileUrl(resourceUrls[i]);
                     learningResourceRepository.save(resource);
                 }
             }
-            System.out.println("Created 2 learning resources (YouTube links) for each course");
 
-            System.out.println("\n=== DATA SEEDING COMPLETE ===");
-            System.out.println("Admin: 1");
-            System.out.println("Teachers: " + savedTeachers.size());
-            System.out.println("Students: " + savedStudents.size());
-            System.out.println("Batches: " + batches.size());
-            System.out.println("Courses: " + savedCourses.size());
-            System.out.println("Enrollments: " + enrollmentRepository.count());
-            System.out.println("Marks: " + marksRepository.count());
-            System.out.println("Attendance: " + attendanceRepository.count());
-            System.out.println("Assignments: " + assignmentRepository.count());
-            System.out.println("Student Submissions: " + studentSubmissionRepository.count());
-            System.out.println("Announcements: " + announcementRepository.count());
-            System.out.println("Learning Resources: " + learningResourceRepository.count());
+            System.out.println("=== DATA SEEDING COMPLETE ===");
         };
     }
 }
