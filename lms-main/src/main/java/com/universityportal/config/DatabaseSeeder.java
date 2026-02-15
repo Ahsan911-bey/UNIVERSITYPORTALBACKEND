@@ -190,7 +190,14 @@ public class DatabaseSeeder {
                     "Human Computer Interaction", "Information Security", "Mobile Application Development",
                     "Big Data Analytics",
                     "Artificial Intelligence", "Distributed Systems", "Digital Logic Design", "Computer Architecture",
-                    "Numerical Computing", "Parallel Computing", "Information Retrieval", "Computer Graphics"
+                    "Numerical Computing", "Parallel Computing", "Information Retrieval", "Computer Graphics",
+                    // New Courses to ensure ~4 per teacher (40 total)
+                    "Blockchain Technology", "Internet of Things", "Cyber Security", "Data Mining",
+                    "Natural Language Processing", "Image Processing", "Theory of Automata",
+                    "Design and Analysis of Algorithms",
+                    "Software Project Management", "Software Quality Assurance", "Linear Algebra",
+                    "Calculus and Analytical Geometry",
+                    "Probability and Statistics", "Professional Ethics", "Technical Writing", "Communication Skills"
             };
             List<Course> courses = new ArrayList<>();
             for (int i = 0; i < allCourseNames.length; i++) {
@@ -198,6 +205,7 @@ public class DatabaseSeeder {
                 course.setCourseNo("CS-" + (101 + i));
                 course.setCourseName(allCourseNames[i]);
                 course.setCredits(3);
+                // Distributes 40 courses among 10 teachers -> 4 courses per teacher
                 course.setTeacher(savedTeachers.get(i % savedTeachers.size()));
                 courses.add(course);
             }
@@ -205,13 +213,17 @@ public class DatabaseSeeder {
             System.out.println("Seeded " + savedCourses.size() + " courses");
 
             // ========== ENROLL STUDENTS ==========
-            int coursesPerStudent = 6;
+            int coursesPerStudent = 7; // Increased to 7
             int totalCourses = savedCourses.size();
             for (Student student : savedStudents) {
-                int startIndex = (int) ((student.getId() - 1) % totalCourses);
-                int step = Math.max(1, totalCourses / coursesPerStudent);
+                // Determine a starting offset based on student ID to randomize their courses
+                int startIndex = (int) ((student.getId() - 1) * 3 % totalCourses);
+
                 for (int k = 0; k < coursesPerStudent; k++) {
-                    Course course = savedCourses.get((startIndex + k * step) % totalCourses);
+                    // Pick courses in a stride to ensure variety
+                    int courseIndex = (startIndex + k) % totalCourses;
+                    Course course = savedCourses.get(courseIndex);
+
                     StudentCourseEnrollment enrollment = new StudentCourseEnrollment();
                     enrollment.setStudent(student);
                     enrollment.setCourse(course);
