@@ -29,6 +29,15 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
+
+        // --- FAIL-SAFE FOR CORS PREFLIGHT ---
+        // If this is an OPTIONS request, DO NOT attempt to authenticate it.
+        // Just return 200 OK so the browser completes the CORS handshake.
+        if ("OPTIONS".equalsIgnoreCase(request.getMethod())) {
+            response.setStatus(HttpServletResponse.SC_OK);
+            return;
+        }
+
         try {
             String jwt = parseJwt(request);
             if (jwt != null && jwtUtils.validateJwtToken(jwt)) {
