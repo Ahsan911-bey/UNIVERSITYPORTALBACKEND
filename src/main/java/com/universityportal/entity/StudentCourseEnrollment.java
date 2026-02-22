@@ -10,18 +10,18 @@ public class StudentCourseEnrollment {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private Student student;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     private Course course;
 
-    @OneToOne(mappedBy = "studentCourseEnrollment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "studentCourseEnrollment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Attendance attendance;
 
-    @OneToOne(mappedBy = "studentCourseEnrollment", cascade = CascadeType.ALL, orphanRemoval = true)
+    @OneToOne(mappedBy = "studentCourseEnrollment", cascade = CascadeType.ALL, orphanRemoval = true, fetch = FetchType.LAZY)
     private Marks marks;
 
     public StudentCourseEnrollment() {
@@ -67,5 +67,3 @@ public class StudentCourseEnrollment {
         this.marks = marks;
     }
 }
-
-

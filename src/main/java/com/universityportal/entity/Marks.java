@@ -15,7 +15,7 @@ public class Marks {
     private Double midsMarks;
     private Double finalMarks;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enrollment_id", unique = true)
     private StudentCourseEnrollment studentCourseEnrollment;
 
@@ -70,5 +70,3 @@ public class Marks {
         this.studentCourseEnrollment = studentCourseEnrollment;
     }
 }
-
-

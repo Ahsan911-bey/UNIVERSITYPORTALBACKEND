@@ -17,7 +17,7 @@ public class Course {
     private String courseName;
     private Integer credits;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "teacher_id")
     private Teacher teacher;
 
@@ -108,5 +108,3 @@ public class Course {
         this.announcements = announcements;
     }
 }
-
-

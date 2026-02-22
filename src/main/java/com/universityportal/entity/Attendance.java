@@ -17,7 +17,7 @@ public class Attendance {
     @Column(length = 1000)
     private String previousAttendance;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "enrollment_id", unique = true)
     private StudentCourseEnrollment studentCourseEnrollment;
 
@@ -72,5 +72,3 @@ public class Attendance {
         this.studentCourseEnrollment = studentCourseEnrollment;
     }
 }
-
-

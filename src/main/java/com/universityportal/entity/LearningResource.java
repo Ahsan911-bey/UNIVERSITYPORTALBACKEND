@@ -13,7 +13,7 @@ public class LearningResource {
     private String title;
     private String fileUrl;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     private Course course;
 
@@ -52,5 +52,3 @@ public class LearningResource {
         this.course = course;
     }
 }
-
-

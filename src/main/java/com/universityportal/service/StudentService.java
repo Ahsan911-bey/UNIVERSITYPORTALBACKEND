@@ -23,15 +23,16 @@ public class StudentService {
     private final StudentSubmissionRepository submissionRepository;
 
     public StudentService(StudentRepository studentRepository,
-                          StudentCourseEnrollmentRepository enrollmentRepository,
-                          AssignmentRepository assignmentRepository,
-                          StudentSubmissionRepository submissionRepository) {
+            StudentCourseEnrollmentRepository enrollmentRepository,
+            AssignmentRepository assignmentRepository,
+            StudentSubmissionRepository submissionRepository) {
         this.studentRepository = studentRepository;
         this.enrollmentRepository = enrollmentRepository;
         this.assignmentRepository = assignmentRepository;
         this.submissionRepository = submissionRepository;
     }
 
+    @Transactional(readOnly = true)
     public StudentDto getStudent(Long studentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new IllegalArgumentException("Student not found"));
@@ -42,32 +43,33 @@ public class StudentService {
     public List<CourseDto> getStudentCourses(Long studentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new IllegalArgumentException("Student not found"));
-        
+
         List<CourseDto> courseDtos = student.getEnrollments().stream()
                 .map(StudentCourseEnrollment::getCourse)
                 .map(CourseMapper::toDto)
                 .toList();
-        
+
         // Add assignments with status for each course
         for (CourseDto courseDto : courseDtos) {
             List<Assignment> assignments = assignmentRepository.findByCourseId(courseDto.getId());
             List<AssignmentWithStatusDto> assignmentDtos = new ArrayList<>();
-            
+
             for (Assignment assignment : assignments) {
                 AssignmentWithStatusDto assignmentDto = new AssignmentWithStatusDto();
                 assignmentDto.setId(assignment.getId());
                 assignmentDto.setTitle(assignment.getTitle());
                 assignmentDto.setDescription(assignment.getDescription());
                 assignmentDto.setDueDate(assignment.getDueDate());
-                
+
                 // Teacher's assignment file
                 assignmentDto.setTeacherFileUrl(assignment.getFileUrl());
-                assignmentDto.setTeacherSubmitted(assignment.getFileUrl() != null && !assignment.getFileUrl().isEmpty());
-                
+                assignmentDto
+                        .setTeacherSubmitted(assignment.getFileUrl() != null && !assignment.getFileUrl().isEmpty());
+
                 // Calculate status dynamically and get student's submission file
                 Optional<StudentSubmission> submission = submissionRepository
                         .findByStudentIdAndAssignmentId(studentId, assignment.getId());
-                
+
                 if (submission.isEmpty()) {
                     assignmentDto.setStatus("pending");
                     assignmentDto.setStudentSubmissionFileUrl(null);
@@ -75,10 +77,10 @@ public class StudentService {
                     StudentSubmission sub = submission.get();
                     // Student's submission file
                     assignmentDto.setStudentSubmissionFileUrl(sub.getFileUrl());
-                    
+
                     LocalDate dueDate = assignment.getDueDate();
                     LocalDateTime submittedAt = sub.getSubmittedAt();
-                    
+
                     if (submittedAt != null && dueDate != null) {
                         LocalDate submissionDate = submittedAt.toLocalDate();
                         if (submissionDate.isBefore(dueDate) || submissionDate.isEqual(dueDate)) {
@@ -90,16 +92,17 @@ public class StudentService {
                         assignmentDto.setStatus("submitted");
                     }
                 }
-                
+
                 assignmentDtos.add(assignmentDto);
             }
-            
+
             courseDto.setAssignments(assignmentDtos);
         }
-        
+
         return courseDtos;
     }
 
+    @Transactional(readOnly = true)
     public List<StudentCourseMarksDto> getStudentMarks(Long studentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new IllegalArgumentException("Student not found"));
@@ -118,6 +121,7 @@ public class StudentService {
                 .toList();
     }
 
+    @Transactional(readOnly = true)
     public List<StudentCourseAttendanceSummaryDto> getStudentAttendance(Long studentId) {
         Student student = studentRepository.findById(studentId)
                 .orElseThrow(() -> new IllegalArgumentException("Student not found"));
@@ -141,11 +145,11 @@ public class StudentService {
                 .orElseThrow(() -> new IllegalArgumentException("Student not found"));
         Assignment assignment = assignmentRepository.findById(dto.getAssignmentId())
                 .orElseThrow(() -> new IllegalArgumentException("Assignment not found"));
-        
+
         // Check if submission already exists
         Optional<StudentSubmission> existingSubmission = submissionRepository
                 .findByStudentIdAndAssignmentId(dto.getStudentId(), dto.getAssignmentId());
-        
+
         StudentSubmission submission;
         if (existingSubmission.isPresent()) {
             submission = existingSubmission.get();
@@ -154,30 +158,30 @@ public class StudentService {
             submission.setStudent(student);
             submission.setAssignment(assignment);
         }
-        
+
         submission.setFileUrl(dto.getFileUrl());
         submission.setSubmittedAt(LocalDateTime.now());
-        
+
         submissionRepository.save(submission);
     }
 
-    // DEPRECATED: This endpoint is no longer used. Assignments are now returned in GET /student/{id}/courses
+    // DEPRECATED: This endpoint is no longer used. Assignments are now returned in
+    // GET /student/{id}/courses
     // @Transactional(readOnly = true)
-    // public List<StudentAssignmentStatusDto> getStudentAssignments(Long studentId) {
-    //     Student student = studentRepository.findById(studentId)
-    //             .orElseThrow(() -> new IllegalArgumentException("Student not found"));
-    //     List<StudentAssignmentStatusDto> result = new ArrayList<>();
-    //     for (StudentCourseEnrollment enrollment : student.getEnrollments()) {
-    //         enrollment.getAssignmentSubmissions().forEach(submission -> {
-    //             StudentAssignmentStatusDto dto = new StudentAssignmentStatusDto();
-    //             dto.setCourseName(enrollment.getCourse().getCourseName());
-    //             dto.setAssignmentTitle(submission.getAssignment().getTitle());
-    //             dto.setStatus(submission.getStatus());
-    //             result.add(dto);
-    //         });
-    //     }
-    //     return result;
+    // public List<StudentAssignmentStatusDto> getStudentAssignments(Long studentId)
+    // {
+    // Student student = studentRepository.findById(studentId)
+    // .orElseThrow(() -> new IllegalArgumentException("Student not found"));
+    // List<StudentAssignmentStatusDto> result = new ArrayList<>();
+    // for (StudentCourseEnrollment enrollment : student.getEnrollments()) {
+    // enrollment.getAssignmentSubmissions().forEach(submission -> {
+    // StudentAssignmentStatusDto dto = new StudentAssignmentStatusDto();
+    // dto.setCourseName(enrollment.getCourse().getCourseName());
+    // dto.setAssignmentTitle(submission.getAssignment().getTitle());
+    // dto.setStatus(submission.getStatus());
+    // result.add(dto);
+    // });
+    // }
+    // return result;
     // }
 }
-
-

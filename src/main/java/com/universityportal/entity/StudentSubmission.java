@@ -12,11 +12,11 @@ public class StudentSubmission {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "student_id")
     private Student student;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "assignment_id")
     private Assignment assignment;
 
@@ -66,5 +66,3 @@ public class StudentSubmission {
         this.submittedAt = submittedAt;
     }
 }
-
-

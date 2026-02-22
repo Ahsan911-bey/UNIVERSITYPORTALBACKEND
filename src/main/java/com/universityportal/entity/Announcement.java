@@ -12,7 +12,7 @@ public class Announcement {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "course_id")
     private Course course;
 
@@ -56,5 +56,3 @@ public class Announcement {
         this.timestamp = timestamp;
     }
 }
-
-

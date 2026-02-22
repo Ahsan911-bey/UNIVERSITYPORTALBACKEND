@@ -20,7 +20,7 @@ public class Student extends User {
 
     private String rollNo;
 
-    @ManyToOne
+    @ManyToOne(fetch = jakarta.persistence.FetchType.LAZY)
     @JoinColumn(name = "batch_id")
     private Batch batchEntity;
 
