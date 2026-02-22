@@ -50,22 +50,23 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
-    @Bean
+   @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.cors(cors -> cors.configurationSource(corsConfigurationSource()))
                 .csrf(csrf -> csrf.disable())
                 .exceptionHandling(exception -> exception.authenticationEntryPoint(unauthorizedHandler))
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers("/files/**").permitAll() // File downloads usually need to be public or handled
-                                                                  // carefully
+                        // ADD THIS LINE RIGHT HERE:
+                        .requestMatchers(org.springframework.http.HttpMethod.OPTIONS, "/**").permitAll() 
+                        
+                        .requestMatchers("/files/**").permitAll() 
                         .requestMatchers("/student/login").permitAll()
                         .requestMatchers("/teacher/login").permitAll()
                         .requestMatchers("/admin/login").permitAll()
                         .anyRequest().authenticated());
 
         http.authenticationProvider(authenticationProvider());
-
         http.addFilterBefore(jwtAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         return http.build();
