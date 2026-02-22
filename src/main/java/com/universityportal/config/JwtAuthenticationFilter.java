@@ -14,7 +14,9 @@ import org.springframework.security.web.authentication.WebAuthenticationDetailsS
 import org.springframework.stereotype.Component;
 import org.springframework.util.StringUtils;
 import org.springframework.web.filter.OncePerRequestFilter;
-
+import org.springframework.boot.web.servlet.FilterRegistrationBean;
+import org.springframework.core.Ordered;
+import org.springframework.web.filter.CorsFilter;
 import java.io.IOException;
 
 @Component
@@ -25,7 +27,16 @@ public class JwtAuthenticationFilter extends OncePerRequestFilter {
 
     @Autowired
     private CustomUserDetailsService userDetailsService;
-
+    
+    @Bean
+    public FilterRegistrationBean<CorsFilter> corsFilterRegistrationBean(org.springframework.web.cors.CorsConfigurationSource corsConfigurationSource) {
+        FilterRegistrationBean<CorsFilter> bean = new FilterRegistrationBean<>(new CorsFilter(corsConfigurationSource));
+        
+        // This is the magic line. It puts CORS before JWT, before Security, before everything.
+        bean.setOrder(Ordered.HIGHEST_PRECEDENCE); 
+        
+        return bean;
+    }
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain)
             throws ServletException, IOException {
